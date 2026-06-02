@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetGrow AI - 会展招商增长智能体</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+<style>
+:root{
+  --primary:#0ea5e9;--primary-dark:#0284c7;--primary-light:#e0f2fe;
+  --accent:#22c55e;--accent-dark:#16a34a;
+  --bg:#f1f5f9;--surface:#ffffff;--surface-alt:#f8fafc;
+  --text:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;
+  --border:#e2e8f0;--border-light:#f1f5f9;
+  --danger:#ef4444;--warning:#f59e0b;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+  --sidebar-w:280px;
+  --transition:all .2s ease;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,textarea,select{font-family:inherit;outline:none}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+/* ===== Layout ===== */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s ease}
+.sidebar-header{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.sidebar-logo span:first-child{font-size:24px}
+.sidebar-logo span:last-child{font-size:18px;font-weight:700;background:linear-gradient(135deg,#22d3ee,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-subtitle{font-size:12px;color:#64748b;margin-top:4px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px 0}
+.sidebar-section{padding:8px 20px 4px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#475569;font-weight:600}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#94a3b8;cursor:pointer;transition:var(--transition);font-size:14px;border-left:3px solid transparent}
+.sidebar-item:hover{background:rgba(255,255,255,.05);color:#e2e8f0}
+.sidebar-item.active{background:rgba(14,165,233,.1);color:#22d3ee;border-left-color:#22d3ee}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center}
+.sidebar-item .badge{margin-left:auto;background:#22d3ee;color:#0f172a;font-size:11px;padding:1px 7px;border-radius:10px;font-weight:600}
+.history-list{flex:1;overflow-y:auto;padding:8px 12px}
+.history-item{padding:10px 12px;border-radius:var(--radius-xs);cursor:pointer;margin-bottom:4px;transition:var(--transition);font-size:13px}
+.history-item:hover{background:rgba(255,255,255,.06)}
+.history-item.active{background:rgba(14,165,233,.15)}
+.history-item .h-title{color:#cbd5e1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-item .h-date{color:#475569;font-size:11px;margin-top:2px}
+.history-item .h-actions{display:none;gap:4px;margin-top:6px}
+.history-item:hover .h-actions{display:flex}
+.history-item .h-actions button{background:rgba(255,255,255,.08);color:#94a3b8;padding:3px 8px;border-radius:4px;font-size:11px}
+.history-item .h-actions button:hover{background:rgba(255,255,255,.15);color:#e2e8f0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px}
+.sidebar-footer button{flex:1;padding:8px;border-radius:var(--radius-xs);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;transition:var(--transition)}
+.btn-settings{background:rgba(255,255,255,.08);color:#94a3b8}
+.btn-settings:hover{background:rgba(255,255,255,.12);color:#e2e8f0}
+.btn-new{background:linear-gradient(135deg,#0ea5e9,#22c55e);color:#fff;font-weight:600}
+.btn-new:hover{opacity:.9;transform:translateY(-1px)}
+
+.main{flex:1;margin-left:var(--sidebar-w);padding:0}
+.main-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.main-header h2{font-size:18px;font-weight:600}
+.header-actions{display:flex;gap:8px;align-items:center}
+.header-actions .api-status{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);padding:6px 12px;border-radius:20px;background:var(--surface-alt)}
+.header-actions .api-status.connected{color:var(--accent-dark);background:#f0fdf4}
+.header-actions .api-status.disconnected{color:var(--danger);background:#fef2f2}
+.header-actions .api-status .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.main-content{padding:32px;max-width:1100px;margin:0 auto}
+
+/* ===== Views ===== */
+.view{display:none}
+.view.active{display:block}
+
+/* ===== Input Form ===== */
+.welcome{text-align:center;margin-bottom:40px}
+.welcome h1{font-size:28px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#0ea5e9,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome p{color:var(--text-secondary);font-size:15px;max-width:600px;margin:0 auto}
+.form-card{background:var(--surface);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:13px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:4px}
+.form-group label .req{color:var(--danger);font-size:14px}
+.form-group input,.form-group textarea,.form-group select{padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;transition:var(--transition);background:var(--surface)}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text-muted)}
+.template-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.template-btn{padding:6px 14px;border-radius:20px;font-size:13px;background:var(--primary-light);color:var(--primary-dark);transition:var(--transition);border:1px solid transparent}
+.template-btn:hover{border-color:var(--primary);background:#fff}
+
+/* Module Selection */
+.module-select{margin-top:24px}
+.module-select h3{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text-secondary)}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.module-check{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-xs);cursor:pointer;transition:var(--transition);border:1.5px solid var(--border);font-size:13px}
+.module-check:hover{border-color:var(--primary-light);background:var(--primary-light)}
+.module-check.checked{border-color:var(--primary);background:var(--primary-light)}
+.module-check input{display:none}
+.module-check .check-box{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:var(--transition);flex-shrink:0}
+.module-check.checked .check-box{background:var(--primary);border-color:var(--primary);color:#fff}
+.module-check .check-label{font-weight:500}
+
+.generate-bar{margin-top:28px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.btn-generate{padding:14px 40px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-size:16px;font-weight:600;border-radius:var(--radius);transition:var(--transition);display:flex;align-items:center;gap:8px}
+.btn-generate:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(14,165,233,.35)}
+.btn-generate:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-generate .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-tip{font-size:13px;color:var(--text-muted)}
+
+/* ===== Output View ===== */
+.output-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+.output-title h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.output-title .meta{font-size:13px;color:var(--text-secondary);display:flex;gap:16px;flex-wrap:wrap}
+.output-actions{display:flex;gap:8px}
+.output-actions button{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;transition:var(--transition)}
+.btn-outline{border:1.5px solid var(--border);background:var(--surface);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+
+/* Tabs */
+.tabs-container{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.tabs-nav{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);padding:0 8px;background:var(--surface-alt)}
+.tab-btn{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text-secondary);white-space:nowrap;border-bottom:2px solid transparent;transition:var(--transition);background:transparent;position:relative}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-btn .tab-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--border-light);font-size:11px;font-weight:700;margin-right:6px;color:var(--text-muted)}
+.tab-btn.active .tab-num{background:var(--primary-light);color:var(--primary)}
+.tab-btn.done .tab-num{background:var(--accent);color:#fff}
+.tab-panel{display:none;padding:28px 32px;min-height:300px}
+.tab-panel.active{display:block}
+.tab-panel .module-title{font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border-light)}
+.tab-panel .module-content{font-size:14px;line-height:1.8;color:#334155}
+.tab-panel .module-content h2{font-size:16px;font-weight:600;color:var(--text);margin:20px 0 10px}
+.tab-panel .module-content h3{font-size:15px;font-weight:600;color:var(--text);margin:16px 0 8px}
+.tab-panel .module-content p{margin-bottom:10px}
+.tab-panel .module-content ul,.tab-panel .module-content ol{margin:8px 0 12px 20px}
+.tab-panel .module-content li{margin-bottom:4px}
+.tab-panel .module-content strong{color:var(--text)}
+.tab-panel .module-content em{color:var(--primary-dark);font-style:normal;font-weight:500}
+.tab-panel .module-content code{background:var(--primary-light);padding:2px 6px;border-radius:4px;font-size:13px;color:var(--primary-dark)}
+.tab-panel .module-content blockquote{border-left:3px solid var(--primary);padding:8px 16px;margin:12px 0;background:var(--primary-light);border-radius:0 var(--radius-xs) var(--radius-xs) 0}
+.tab-panel .copy-btn{position:absolute;top:12px;right:12px;padding:6px 12px;border-radius:var(--radius-xs);background:var(--surface-alt);border:1px solid var(--border);font-size:12px;color:var(--text-secondary);transition:var(--transition)}
+.tab-panel .copy-btn:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.tab-panel{position:relative}
+.tab-progress{display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--text-muted);font-size:14px}
+.tab-progress .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
+
+/* ===== History View ===== */
+.history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.history-card{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:var(--transition);border:2px solid transparent}
+.history-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.history-card.selected{border-color:var(--primary)}
+.history-card h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.history-card .hc-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px;display:flex;gap:12px}
+.history-card .hc-preview{font-size:13px;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.history-card .hc-actions{display:flex;gap:6px;margin-top:12px}
+.history-card .hc-actions button{padding:5px 10px;border-radius:4px;font-size:12px;transition:var(--transition)}
+
+/* ===== Compare View ===== */
+.compare-bar{display:flex;gap:12px;margin-bottom:20px;align-items:center}
+.compare-bar select{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;flex:1}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.compare-panel{background:var(--surface);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.compare-panel h3{font-size:15px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light)}
+
+/* ===== Settings Modal ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:32px;width:480px;max-width:90vw;box-shadow:var(--shadow-lg)}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.modal .modal-desc{font-size:14px;color:var(--text-secondary);margin-bottom:24px}
+.modal .form-group{margin-bottom:16px}
+.modal .form-group .help{font-size:12px;color:var(--text-muted);margin-top:4px}
+.modal .form-group .help a{color:var(--primary);text-decoration:none}
+.modal .form-group .help a:hover{text-decoration:underline}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:24px}
+.model-select-group{display:flex;gap:8px;flex-wrap:wrap}
+.model-opt{padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;cursor:pointer;transition:var(--transition)}
+.model-opt:hover{border-color:var(--primary-light)}
+.model-opt.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+.provider-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.provider-opt{padding:12px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.provider-opt:hover{border-color:var(--primary-light);background:var(--surface-alt)}
+.provider-opt.selected{border-color:var(--primary);background:var(--primary-light)}
+.provider-icon{font-size:20px;line-height:1}
+.provider-name{font-size:13px;font-weight:600;color:var(--text)}
+.provider-sub{font-size:11px;color:var(--text-muted)}
+
+/* ===== Toast ===== */
+.toast-container{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:var(--radius-sm);color:#fff;font-size:14px;animation:slideIn .3s ease;box-shadow:var(--shadow-md);max-width:360px}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+.toast.info{background:#0284c7}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ===== Responsive ===== */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .main-content{padding:20px 16px}
+  .form-grid{grid-template-columns:1fr}
+  .module-grid{grid-template-columns:1fr 1fr}
+  .output-header{flex-direction:column;gap:16px}
+  .compare-grid{grid-template-columns:1fr}
+  .tabs-nav{padding:0}
+  .tab-btn{padding:10px 12px;font-size:12px}
+}
+
+/* ===== Print ===== */
+/* ===== Usage Badge ===== */
+.usage-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.usage-badge.free{background:#fef3c7;color:#92400e}
+.usage-badge.activated{background:#dcfce7;color:#166534}
+
+/* ===== Activation UI ===== */
+.activation-info{background:var(--surface-alt);border-radius:var(--radius-sm);padding:20px;border:1px solid var(--border)}
+.activation-price{display:flex;align-items:baseline;gap:6px;margin-bottom:14px}
+.price-tag{font-size:36px;font-weight:800;color:var(--primary);line-height:1}
+.price-unit{font-size:14px;color:var(--text-secondary)}
+.activation-features{display:flex;flex-direction:column;gap:6px}
+.af-item{font-size:14px;color:var(--text)}
+.activation-contact{margin-top:16px;font-size:13px;color:var(--text-secondary);text-align:center}
+.activation-contact strong{color:var(--text)}
+
+/* ===== Print ===== */
+@media print{
+  .sidebar,.main-header,.output-actions,.tabs-nav,.copy-btn,.toast-container{display:none!important}
+  .main{margin-left:0!important}
+  .main-content{max-width:100%!important;padding:0!important}
+  .tab-panel{display:block!important;padding:16px 0!important;border-bottom:1px solid #eee}
+  .tab-panel .module-title{font-size:16px!important}
+  .tabs-container{box-shadow:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><span>🚀</span><span>MeetGrow AI</span></div>
+      <div class="sidebar-subtitle">会展招商增长智能体</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">导航</div>
+      <div class="sidebar-item active" data-view="input" onclick="switchView('input')">
+        <span class="icon">📝</span>新建方案
+      </div>
+      <div class="sidebar-item" data-view="output" onclick="switchView('output')" id="nav-output" style="display:none">
+        <span class="icon">📊</span>当前方案
+      </div>
+      <div class="sidebar-item" data-view="history" onclick="switchView('history')">
+        <span class="icon">📁</span>历史方案<span class="badge" id="history-count">0</span>
+      </div>
+      <div class="sidebar-item" data-view="compare" onclick="switchView('compare')" id="nav-compare" style="display:none">
+        <span class="icon">🔍</span>方案对比
+      </div>
+      <div class="sidebar-section" style="margin-top:16px">历史记录</div>
+    </nav>
+    <div class="history-list" id="sidebar-history"></div>
+    <div class="sidebar-footer">
+      <button class="btn-settings" onclick="openSettings()">⚙️ 设置</button>
+      <button class="btn-new" onclick="switchView('input')">＋ 新建</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="main-header">
+      <h2 id="page-title">新建招商增长方案</h2>
+      <div class="header-actions">
+        <div class="api-status disconnected" id="api-status" onclick="openSettings()" title="点击配置API">
+          <span class="dot"></span><span class="status-text">未连接</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- Input View -->
+      <div class="view active" id="view-input">
+        <div class="welcome">
+          <h1>🚀 一键生成大会招商增长闭环</h1>
+          <p>输入活动基本信息，AI将在1-3分钟内自动生成从定位、招商、传播到转化的完整11模块增长方案</p>
+        </div>
+        <div class="form-card">
+          <div class="template-bar">
+            <span style="font-size:13px;color:var(--text-muted);line-height:32px">快速填入：</span>
+            <button class="template-btn" onclick="fillTemplate('summit')">🏢 AI峰会</button>
+            <button class="template-btn" onclick="fillTemplate('park')">🏭 园区招商</button>
+            <button class="template-btn" onclick="fillTemplate('training')">📚 企业培训</button>
+            <button class="template-btn" onclick="fillTemplate('salon')">☕ 行业沙龙</button>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>活动名称 <span class="req">*</span></label>
+              <input type="text" id="f-name" placeholder="如：2026企业AI落地增长峰会">
+            </div>
+            <div class="form-group">
+              <label>活动类型</label>
+              <select id="f-type">
+                <option value="大会/峰会">大会/峰会</option>
+                <option value="沙龙/论坛">沙龙/论坛</option>
+                <option value="招商会">招商会</option>
+                <option value="培训会">培训会</option>
+                <option value="园区活动">园区活动</option>
+                <option value="行业年会">行业年会</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>目标客户 <span class="req">*</span></label>
+              <input type="text" id="f-audience" placeholder="如：传统企业老板、制造业老板、AI创业者">
+            </div>
+            <div class="form-group">
+              <label>活动规模</label>
+              <select id="f-scale">
+                <option value="50人以下">50人以下</option>
+                <option value="50-200人">50-200人</option>
+                <option value="200-500人">200-500人</option>
+                <option value="500-1000人" selected>500-1000人</option>
+                <option value="1000人以上">1000人以上</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>核心目标</label>
+              <input type="text" id="f-goals" placeholder="如：招商、卖票、私域沉淀、城市合伙人招募、会后成交">
+            </div>
+            <div class="form-group full">
+              <label>补充说明</label>
+              <textarea id="f-extra" placeholder="其他需要AI考虑的特殊要求，如特定行业、嘉宾资源、预算限制等"></textarea>
+            </div>
+          </div>
+          <div class="module-select">
+            <h3>📋 选择输出模块（默认全选）</h3>
+            <div class="module-grid" id="module-grid"></div>
+          </div>
+          <div class="generate-bar">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span class="gen-tip">预计生成时间 1-3 分钟</span>
+              <span class="usage-badge" id="usage-badge"></span>
+            </div>
+            <button class="btn-generate" id="btn-generate" onclick="generatePlan()">
+              <span>🚀</span><span>开始生成增长方案</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output View -->
+      <div class="view" id="view-output">
+        <div class="output-header">
+          <div class="output-title">
+            <h1 id="output-plan-title"></h1>
+            <div class="meta" id="output-plan-meta"></div>
+          </div>
+          <div class="output-actions">
+            <button class="btn-outline" onclick="exportMarkdown()">📝 Markdown</button>
+            <button class="btn-outline" onclick="exportWord()">📄 Word</button>
+            <button class="btn-outline" onclick="window.print()">🖨️ 打印/PDF</button>
+            <button class="btn-outline" onclick="copyAll()">📋 复制全部</button>
+          </div>
+        </div>
+        <div class="tabs-container">
+          <div class="tabs-nav" id="tabs-nav"></div>
+          <div id="tabs-content"></div>
+        </div>
+      </div>
+
+      <!-- History View -->
+      <div class="view" id="view-history">
+        <div class="output-header">
+          <div class="output-title">
+            <h1>📁 历史方案</h1>
+            <div class="meta">选择方案进行查看、对比或删除</div>
+          </div>
+          <div class="output-actions">
+            <button class="btn-outline" id="btn-compare-toggle" onclick="toggleCompareMode()">🔍 开启对比模式</button>
+            <button class="btn-outline" onclick="clearHistory()" style="color:var(--danger)">🗑️ 清空</button>
+          </div>
+        </div>
+        <div class="history-grid" id="history-grid"></div>
+      </div>
+
+      <!-- Compare View -->
+      <div class="view" id="view-compare">
+        <div class="output-header">
+          <div class="output-title">
+            <h1>🔍 方案对比</h1>
+          </div>
+          <div class="output-actions">
+            <button class="btn-outline" onclick="switchView('history')">← 返回</button>
+          </div>
+        </div>
+        <div class="compare-bar">
+          <select id="compare-a" onchange="renderCompare()"></select>
+          <span style="font-size:14px;color:var(--text-muted)">VS</span>
+          <select id="compare-b" onchange="renderCompare()"></select>
+        </div>
+        <div id="compare-module-select" style="margin-bottom:16px"></div>
+        <div class="compare-grid" id="compare-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal" style="width:540px">
+    <h2>⚙️ API 设置</h2>
+    <p class="modal-desc">选择AI模型服务商并配置API密钥。密钥仅存储在您的浏览器本地，不会上传。</p>
+    <div class="form-group">
+      <label>选择服务商</label>
+      <div class="provider-grid" id="provider-select">
+        <div class="provider-opt selected" data-provider="dashscope" onclick="selectProvider(this)">
+          <span class="provider-icon">🔵</span>
+          <span class="provider-name">通义千问</span>
+          <span class="provider-sub">阿里云 DashScope</span>
+        </div>
+        <div class="provider-opt" data-provider="zhipu" onclick="selectProvider(this)">
+          <span class="provider-icon">🟢</span>
+          <span class="provider-name">智谱AI</span>
+          <span class="provider-sub">ChatGLM</span>
+        </div>
+        <div class="provider-opt" data-provider="moonshot" onclick="selectProvider(this)">
+          <span class="provider-icon">🌙</span>
+          <span class="provider-name">Moonshot</span>
+          <span class="provider-sub">月之暗面</span>
+        </div>
+        <div class="provider-opt" data-provider="deepseek" onclick="selectProvider(this)">
+          <span class="provider-icon">🔷</span>
+          <span class="provider-name">DeepSeek</span>
+          <span class="provider-sub">深度求索</span>
+        </div>
+        <div class="provider-opt" data-provider="qianfan" onclick="selectProvider(this)">
+          <span class="provider-icon">🔴</span>
+          <span class="provider-name">文心一言</span>
+          <span class="provider-sub">百度千帆</span>
+        </div>
+        <div class="provider-opt" data-provider="custom" onclick="selectProvider(this)">
+          <span class="provider-icon">⚙️</span>
+          <span class="provider-name">自定义</span>
+          <span class="provider-sub">OpenAI兼容接口</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>选择模型</label>
+      <div class="model-select-group" id="model-select"></div>
+    </div>
+    <div class="form-group">
+      <label>API Key <span class="req">*</span></label>
+      <input type="password" id="s-apikey" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="help" id="apikey-help"></div>
+    </div>
+    <div class="form-group" id="baseurl-group">
+      <label>API Base URL</label>
+      <input type="text" id="s-baseurl" value="https://dashscope.aliyuncs.com/compatible-mode/v1">
+      <div class="help">选择服务商后自动填入，也可手动修改为其他兼容地址</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeSettings()">取消</button>
+      <button class="btn-primary" onclick="saveSettings()" style="padding:10px 24px;border-radius:var(--radius-sm)">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<!-- Activation Modal -->
+<div class="modal-overlay" id="modal-activation">
+  <div class="modal" style="width:460px">
+    <h2>🔑 激活产品</h2>
+    <p class="modal-desc">免费体验次数已用完，请输入激活码解锁无限使用。</p>
+    <div class="activation-info">
+      <div class="activation-price">
+        <span class="price-tag">¥99</span>
+        <span class="price-unit">/ 永久激活</span>
+      </div>
+      <div class="activation-features">
+        <div class="af-item">✅ 无限次生成招商方案</div>
+        <div class="af-item">✅ 全部11个输出模块</div>
+        <div class="af-item">✅ 导出Word/Markdown/PDF</div>
+        <div class="af-item">✅ 历史方案管理与对比</div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:20px">
+      <label>激活码</label>
+      <input type="text" id="activation-code" placeholder="MG-XXXX-XXXX-XXXX" style="text-align:center;font-size:16px;letter-spacing:2px;font-weight:600" maxlength="19">
+    </div>
+    <div class="activation-contact">
+      购买激活码请联系：<strong id="contact-info">微信/电话：18969081266</strong>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeActivation()">稍后再说</button>
+      <button class="btn-primary" onclick="activateProduct()" style="padding:10px 24px;border-radius:var(--radius-sm)">激活</button>
+    </div>
+  </div>
+</div>
+
+<!-- Paywall Modal (shown when free limit reached) -->
+<div class="modal-overlay" id="modal-paywall">
+  <div class="modal" style="width:420px;text-align:center">
+    <div style="font-size:48px;margin-bottom:12px">🚀</div>
+    <h2>免费体验次数已用完</h2>
+    <p class="modal-desc" style="margin-bottom:20px">您已免费生成 <strong>3</strong> 次方案。激活后可无限使用全部功能。</p>
+    <div class="activation-info" style="text-align:left">
+      <div class="activation-price" style="justify-content:center">
+        <span class="price-tag">¥99</span>
+        <span class="price-unit">/ 永久激活</span>
+      </div>
+      <div class="activation-features">
+        <div class="af-item">✅ 无限次生成 · 全11模块</div>
+        <div class="af-item">✅ 导出Word/Markdown/PDF</div>
+        <div class="af-item">✅ 历史方案管理与对比</div>
+      </div>
+    </div>
+    <div class="modal-actions" style="justify-content:center;margin-top:24px">
+      <button class="btn-outline" onclick="closePaywall()">关闭</button>
+      <button class="btn-primary" onclick="closePaywall();openActivation()" style="padding:10px 24px;border-radius:var(--radius-sm)">输入激活码</button>
+    </div>
+    <div class="activation-contact" style="margin-top:16px">
+      购买激活码请联系：<strong id="contact-info-pw">微信/电话：18969081266</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ===== Configuration =====
+const MODULES = [
+  {id:1, name:'大会定位', icon:'🎯', desc:'明确活动核心价值与差异化定位'},
+  {id:2, name:'目标客户画像', icon:'👥', desc:'精准描绘目标受众特征'},
+  {id:3, name:'核心卖点', icon:'💎', desc:'提炼活动核心吸引力'},
+  {id:4, name:'招商合作方案', icon:'🤝', desc:'设计多层次赞助合作体系'},
+  {id:5, name:'赞助权益设计', icon:'📋', desc:'量化赞助商投入产出'},
+  {id:6, name:'嘉宾邀约话术', icon:'🎤', desc:'高转化率邀约沟通方案'},
+  {id:7, name:'朋友圈文案', icon:'📱', desc:'系列化社交传播素材'},
+  {id:8, name:'短视频脚本', icon:'🎬', desc:'短视频内容创作方案'},
+  {id:9, name:'社群运营SOP', icon:'💬', desc:'社群全周期运营流程'},
+  {id:10, name:'客户分层跟进', icon:'📊', desc:'ABC分层精准跟进策略'},
+  {id:11, name:'会后成交话术', icon:'💰', desc:'会后转化与成交方案'}
+];
+
+const TEMPLATES = {
+  summit: {
+    name:'2026企业AI落地增长峰会', type:'大会/峰会',
+    audience:'传统企业老板、制造业老板、AI创业者、投资人、园区负责人',
+    scale:'500-1000人', goals:'招商赞助、门票销售、私域沉淀、城市合伙人招募、会后项目成交',
+    extra:'强调AI落地实操而非概念分享，需要有现场对接和签约环节'
+  },
+  park: {
+    name:'2026智能制造产业园招商推介会', type:'园区活动',
+    audience:'智能制造企业创始人、科技型企业CEO、投资机构合伙人',
+    scale:'200-500人', goals:'园区入驻企业招引、产业基金对接、上下游产业链合作',
+    extra:'重点展示园区政策优势、配套服务和已入驻标杆企业'
+  },
+  training: {
+    name:'2026企业数字化转型实战训练营', type:'培训会',
+    audience:'中小企业高管、IT部门负责人、数字化转型负责人',
+    scale:'50-200人', goals:'课程销售、企业内训签约、年度顾问服务转化、社群会员招募',
+    extra:'需要设计从免费公开课到付费训练营的转化路径'
+  },
+  salon: {
+    name:'新消费品牌增长私享会', type:'沙龙/论坛',
+    audience:'新消费品牌创始人、电商运营负责人、MCN机构负责人',
+    scale:'50人以下', goals:'品牌合作签约、私域社群会员招募、咨询服务转化',
+    extra:'高端闭门形式，强调圈层价值和深度交流'
+  }
+};
+
+const SYSTEM_PROMPT = `你是 MeetGrow AI 会展招商增长智能体，专为大会、峰会、沙龙、园区招商、企业培训、行业年会等活动设计完整的增长闭环方案。
+
+你的核心原则：
+1. 以成交和转化为目标，不要只写漂亮文案，每个模块都要可落地执行
+2. 输出必须结构化、可直接复制使用
+3. 包含具体的话术模板、执行动作和下一步转化路径
+4. 基于真实商业场景，数据合理可信
+5. 每个模块独立完整，不依赖其他模块也能执行
+
+输出格式要求：
+- 每个模块以 ## 模块名称 作为标题
+- 使用清晰的层级结构（h2/h3/列表/加粗）
+- 话术模板用引用格式
+- 关键数字加粗
+- 执行动作用列表列出
+- 每个模块末尾加「✅ 执行清单」小节`;
+
+let state = {
+  apiKey: localStorage.getItem('mg_apikey') || '',
+  baseUrl: localStorage.getItem('mg_baseurl') || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  model: localStorage.getItem('mg_model') || 'qwen-plus',
+  selectedModules: MODULES.map(m=>m.id),
+  currentPlan: null,
+  history: JSON.parse(localStorage.getItem('mg_history') || '[]'),
+  isGenerating: false,
+  compareMode: false,
+  compareSelections: [],
+  // Activation & usage tracking
+  activated: localStorage.getItem('mg_activated') === 'true',
+  usageCount: parseInt(localStorage.getItem('mg_usage') || '0'),
+  freeLimit: 3,
+  activationCode: localStorage.getItem('mg_code') || ''
+};
+
+// ===== Initialization =====
+function init(){
+  renderModuleGrid();
+  updateApiStatus();
+  updateHistoryCount();
+  renderSidebarHistory();
+  updateUsageBadge();
+  // Initialize provider selection from saved state
+  const savedProvider = localStorage.getItem('mg_provider') || 'dashscope';
+  const providerEl = document.querySelector(`.provider-opt[data-provider="${savedProvider}"]`);
+  if(providerEl) selectProvider(providerEl);
+}
+
+function renderModuleGrid(){
+  const grid = document.getElementById('module-grid');
+  grid.innerHTML = MODULES.map(m=>`
+    <div class="module-check checked" data-id="${m.id}" onclick="toggleModule(this,${m.id})">
+      <div class="check-box">✓</div>
+      <span class="check-label">${m.icon} ${m.name}</span>
+    </div>
+  `).join('');
+}
+
+function toggleModule(el, id){
+  el.classList.toggle('checked');
+  if(el.classList.contains('checked')){
+    if(!state.selectedModules.includes(id)) state.selectedModules.push(id);
+  } else {
+    state.selectedModules = state.selectedModules.filter(x=>x!==id);
+  }
+}
+
+// ===== View Management =====
+function switchView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  const navItem = document.querySelector(`.sidebar-item[data-view="${view}"]`);
+  if(navItem) navItem.classList.add('active');
+  const titles = {input:'新建招商增长方案',output:'方案详情',history:'历史方案',compare:'方案对比'};
+  document.getElementById('page-title').textContent = titles[view] || '';
+  if(view==='history') renderHistoryGrid();
+  if(view==='compare') initCompare();
+}
+
+// ===== Templates =====
+function fillTemplate(key){
+  const t = TEMPLATES[key];
+  document.getElementById('f-name').value = t.name;
+  document.getElementById('f-type').value = t.type;
+  document.getElementById('f-audience').value = t.audience;
+  document.getElementById('f-scale').value = t.scale;
+  document.getElementById('f-goals').value = t.goals;
+  document.getElementById('f-extra').value = t.extra;
+  toast('已填入「'+t.name.replace(/\d{4}/,'')+'」模板','info');
+}
+
+// ===== Settings =====
+const PROVIDERS = {
+  dashscope: {
+    name: '通义千问', baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    models: [
+      {id:'qwen-plus', name:'Qwen Plus（推荐）', desc:'性价比最优'},
+      {id:'qwen-max', name:'Qwen Max', desc:'最强能力'},
+      {id:'qwen-turbo', name:'Qwen Turbo', desc:'速度最快'}
+    ],
+    keyUrl: 'https://dashscope.console.aliyun.com/apiKey',
+    keyHelp: '前往 <a href="https://dashscope.console.aliyun.com/apiKey" target="_blank">阿里云DashScope控制台</a> 获取API Key（新用户有免费额度）'
+  },
+  zhipu: {
+    name: '智谱AI', baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
+    models: [
+      {id:'glm-4-plus', name:'GLM-4-Plus（推荐）', desc:'旗舰模型'},
+      {id:'glm-4', name:'GLM-4', desc:'均衡性能'},
+      {id:'glm-4-flash', name:'GLM-4-Flash', desc:'免费可用'}
+    ],
+    keyUrl: 'https://open.bigmodel.cn/usercenter/apikeys',
+    keyHelp: '前往 <a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank">智谱AI开放平台</a> 获取API Key（GLM-4-Flash免费）'
+  },
+  moonshot: {
+    name: 'Moonshot', baseUrl: 'https://api.moonshot.cn/v1',
+    models: [
+      {id:'moonshot-v1-32k', name:'Moonshot 32K（推荐）', desc:'长文本能力强'},
+      {id:'moonshot-v1-128k', name:'Moonshot 128K', desc:'超长上下文'},
+      {id:'moonshot-v1-8k', name:'Moonshot 8K', desc:'轻量快速'}
+    ],
+    keyUrl: 'https://platform.moonshot.cn/console/api-keys',
+    keyHelp: '前往 <a href="https://platform.moonshot.cn/console/api-keys" target="_blank">Moonshot开放平台</a> 获取API Key'
+  },
+  deepseek: {
+    name: 'DeepSeek', baseUrl: 'https://api.deepseek.com',
+    models: [
+      {id:'deepseek-chat', name:'DeepSeek Chat（推荐）', desc:'综合能力强'},
+      {id:'deepseek-reasoner', name:'DeepSeek Reasoner', desc:'深度推理'}
+    ],
+    keyUrl: 'https://platform.deepseek.com/api_keys',
+    keyHelp: '前往 <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek开放平台</a> 获取API Key（价格极低）'
+  },
+  qianfan: {
+    name: '文心一言', baseUrl: 'https://qianfan.baidubce.com/v2',
+    models: [
+      {id:'ernie-4.0-8k', name:'ERNIE 4.0（推荐）', desc:'最强能力'},
+      {id:'ernie-3.5-8k', name:'ERNIE 3.5', desc:'性价比优'},
+      {id:'ernie-speed-128k', name:'ERNIE Speed', desc:'速度最快'}
+    ],
+    keyUrl: 'https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application',
+    keyHelp: '前往 <a href="https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application" target="_blank">百度千帆控制台</a> 创建应用获取API Key'
+  },
+  custom: {
+    name: '自定义', baseUrl: '',
+    models: [
+      {id:'custom-model', name:'自定义模型', desc:'输入模型名称'}
+    ],
+    keyUrl: '',
+    keyHelp: '填写任何OpenAI兼容接口的API Key'
+  }
+};
+
+let currentProvider = localStorage.getItem('mg_provider') || 'dashscope';
+
+function openSettings(){
+  // Restore saved provider
+  const savedProvider = localStorage.getItem('mg_provider') || 'dashscope';
+  const providerEl = document.querySelector(`.provider-opt[data-provider="${savedProvider}"]`);
+  if(providerEl) selectProvider(providerEl);
+  document.getElementById('s-apikey').value = state.apiKey || '';
+  document.getElementById('modal-settings').classList.add('show');
+}
+function closeSettings(){ document.getElementById('modal-settings').classList.remove('show'); }
+
+function selectProvider(el){
+  document.querySelectorAll('.provider-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  const providerKey = el.dataset.provider;
+  currentProvider = providerKey;
+  const provider = PROVIDERS[providerKey];
+
+  // Update Base URL
+  document.getElementById('s-baseurl').value = provider.baseUrl;
+  document.getElementById('baseurl-group').style.display = 'block';
+
+  // Update models
+  const modelSelect = document.getElementById('model-select');
+  const savedModel = localStorage.getItem('mg_model') || provider.models[0].id;
+  const hasSaved = provider.models.some(x => x.id === savedModel);
+  modelSelect.innerHTML = provider.models.map((m,i)=>`
+    <div class="model-opt ${(m.id===savedModel || (!hasSaved && i===0))?'selected':''}" data-model="${m.id}" onclick="selectModel(this)">
+      ${m.name}${m.desc?' <span style="font-size:11px;color:var(--text-muted)">'+m.desc+'</span>':''}
+    </div>
+  `).join('');
+
+  // If custom, show model name input
+  if(providerKey === 'custom'){
+    modelSelect.innerHTML = '<input type="text" id="custom-model-input" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;width:100%" placeholder="输入模型名称，如 gpt-4o" value="'+(state.model||'')+'">';
+  }
+
+  // Update API Key help
+  document.getElementById('apikey-help').innerHTML = provider.keyHelp;
+  document.getElementById('s-apikey').placeholder = providerKey === 'custom' ? '输入API Key' : 'sk-xxxxxxxxxxxxxxxxxxxxxxxx';
+}
+
+function selectModel(el){
+  document.querySelectorAll('.model-opt').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function saveSettings(){
+  const key = document.getElementById('s-apikey').value.trim();
+  const url = document.getElementById('s-baseurl').value.trim();
+  let model;
+  if(currentProvider === 'custom'){
+    model = document.getElementById('custom-model-input')?.value.trim() || 'custom-model';
+  } else {
+    model = document.querySelector('.model-opt.selected')?.dataset.model || PROVIDERS[currentProvider].models[0].id;
+  }
+  if(!key){ toast('请输入API Key','error'); return; }
+  if(currentProvider === 'custom' && !url){ toast('请输入API Base URL','error'); return; }
+  state.apiKey = key;
+  state.baseUrl = (url || PROVIDERS[currentProvider].baseUrl).replace(/\/+$/,'');
+  state.model = model;
+  localStorage.setItem('mg_apikey', key);
+  localStorage.setItem('mg_baseurl', state.baseUrl);
+  localStorage.setItem('mg_model', model);
+  localStorage.setItem('mg_provider', currentProvider);
+  updateApiStatus();
+  closeSettings();
+  toast(`已保存 - ${PROVIDERS[currentProvider].name} / ${model}`,'success');
+}
+function updateApiStatus(){
+  const el = document.getElementById('api-status');
+  if(state.apiKey){
+    el.className = 'api-status connected';
+    const providerName = PROVIDERS[currentProvider]?.name || '自定义';
+    el.querySelector('.status-text').textContent = `${providerName} / ${state.model}`;
+  } else {
+    el.className = 'api-status disconnected';
+    el.querySelector('.status-text').textContent = '未连接';
+  }
+}
+
+// ===== Activation & Paywall =====
+function updateUsageBadge(){
+  const badge = document.getElementById('usage-badge');
+  if(!badge) return;
+  if(state.activated){
+    badge.className = 'usage-badge activated';
+    badge.innerHTML = '✅ 已激活 · 无限使用';
+  } else {
+    const remaining = state.freeLimit - state.usageCount;
+    if(remaining > 0){
+      badge.className = 'usage-badge free';
+      badge.innerHTML = `🎁 免费体验剩余 ${remaining} 次`;
+    } else {
+      badge.className = 'usage-badge free';
+      badge.innerHTML = '🔒 免费次数已用完';
+    }
+  }
+}
+
+function openActivation(){
+  document.getElementById('modal-activation').classList.add('show');
+}
+function closeActivation(){
+  document.getElementById('modal-activation').classList.remove('show');
+}
+function closePaywall(){
+  document.getElementById('modal-paywall').classList.remove('show');
+}
+
+function activateProduct(){
+  const code = document.getElementById('activation-code').value.trim().toUpperCase();
+  if(!code){ toast('请输入激活码','error'); return; }
+
+  // Validate format: MG-XXXX-XXXX-XXXX
+  if(!/^MG-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)){
+    toast('激活码格式错误，正确格式：MG-XXXX-XXXX-XXXX','error');
+    return;
+  }
+
+  // Validate activation code using checksum
+  // Code structure: MG-AAAA-BBBB-CCCC
+  // The last group CCCC is a checksum derived from AAAA and BBBB
+  const parts = code.split('-');
+  const segment1 = parts[1]; // AAAA
+  const segment2 = parts[2]; // BBBB
+  const checksum = parts[3]; // CCCC
+
+  // Simple hash function for validation
+  let hash = 0;
+  const combined = segment1 + segment2;
+  for(let i = 0; i < combined.length; i++){
+    hash = ((hash << 5) - hash + combined.charCodeAt(i)) | 0;
+  }
+  const expected = Math.abs(hash).toString(36).toUpperCase().padStart(4,'0').slice(0,4);
+
+  if(checksum === expected){
+    // Valid code - activate
+    state.activated = true;
+    state.activationCode = code;
+    localStorage.setItem('mg_activated', 'true');
+    localStorage.setItem('mg_code', code);
+    closeActivation();
+    updateUsageBadge();
+    toast('🎉 激活成功！已解锁无限使用','success');
+  } else {
+    toast('激活码无效，请检查后重试','error');
+  }
+}
+
+// ===== Core: Generate Plan =====
+async function generatePlan(){
+  if(state.isGenerating) return;
+  if(!state.apiKey){ openSettings(); toast('请先配置API Key','error'); return; }
+
+  // Paywall check
+  if(!state.activated && state.usageCount >= state.freeLimit){
+    document.getElementById('modal-paywall').classList.add('show');
+    return;
+  }
+
+  const name = document.getElementById('f-name').value.trim();
+  const audience = document.getElementById('f-audience').value.trim();
+  if(!name){ toast('请输入活动名称','error'); return; }
+  if(!audience){ toast('请输入目标客户','error'); return; }
+  if(state.selectedModules.length===0){ toast('请至少选择一个输出模块','error'); return; }
+
+  const type = document.getElementById('f-type').value;
+  const scale = document.getElementById('f-scale').value;
+  const goals = document.getElementById('f-goals').value.trim();
+  const extra = document.getElementById('f-extra').value.trim();
+
+  // Build user prompt
+  const moduleNames = state.selectedModules.sort((a,b)=>a-b).map(id=>{
+    const m = MODULES.find(x=>x.id===id);
+    return `${id}. ${m.name}`;
+  }).join('、');
+
+  let userPrompt = `请为以下活动生成完整的招商增长方案：
+
+【活动名称】${name}
+【活动类型】${type}
+【目标客户】${audience}
+【活动规模】${scale}
+【核心目标】${goals || '招商、传播、客户转化'}
+${extra ? '【补充说明】' + extra : ''}
+
+请按以下模块输出（每个模块独立完整，包含可直接复制使用的话术和明确的执行动作）：
+${moduleNames}
+
+每个模块末尾请附上「✅ 执行清单」，列出该模块的关键执行步骤。
+请确保所有话术真实可信、可直接使用，数据合理。`;
+
+  // Switch to output view
+  state.isGenerating = true;
+  state.currentPlan = {
+    id: Date.now().toString(),
+    name, type, audience, scale, goals, extra,
+    modules: state.selectedModules.slice().sort((a,b)=>a-b),
+    content: {},
+    rawOutput: '',
+    createdAt: new Date().toISOString()
+  };
+
+  switchView('output');
+  document.getElementById('nav-output').style.display = 'flex';
+  document.getElementById('output-plan-title').textContent = name;
+  document.getElementById('output-plan-meta').innerHTML =
+    `<span>📅 ${new Date().toLocaleDateString('zh-CN')}</span>
+     <span>📋 ${type}</span>
+     <span>👥 ${audience}</span>
+     <span>📏 ${scale}</span>`;
+
+  // Build tabs
+  const selectedMods = state.selectedModules.slice().sort((a,b)=>a-b).map(id=>MODULES.find(m=>m.id===id));
+  const tabsNav = document.getElementById('tabs-nav');
+  const tabsContent = document.getElementById('tabs-content');
+
+  tabsNav.innerHTML = selectedMods.map((m,i)=>`
+    <button class="tab-btn ${i===0?'active':''}" data-tab="${m.id}" onclick="switchTab(${m.id})">
+      <span class="tab-num">${m.id}</span>${m.name}
+    </button>
+  `).join('');
+
+  tabsContent.innerHTML = selectedMods.map((m,i)=>`
+    <div class="tab-panel ${i===0?'active':''}" id="panel-${m.id}">
+      <div class="module-title">${m.icon} ${m.name}</div>
+      <button class="copy-btn" onclick="copyModule(${m.id})">📋 复制</button>
+      <div class="module-content" id="content-${m.id}">
+        <div class="tab-progress"><div class="spinner"></div> 正在生成中...</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Update generate button
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div><span>正在生成...</span>';
+
+  try {
+    const response = await fetch(`${state.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.apiKey}`
+      },
+      body: JSON.stringify({
+        model: state.model,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt }
+        ],
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 8000
+      })
+    });
+
+    if(!response.ok){
+      const errData = await response.json().catch(()=>({}));
+      throw new Error(errData.error?.message || `API请求失败 (${response.status})`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buffer += decoder.decode(value, {stream:true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for(const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if(data === '[DONE]') continue;
+        try {
+          const json = JSON.parse(data);
+          const delta = json.choices?.[0]?.delta?.content;
+          if(delta){
+            fullText += delta;
+            // Parse and render modules progressively
+            parseAndRenderModules(fullText);
+          }
+        } catch(e){}
+      }
+    }
+
+    state.currentPlan.rawOutput = fullText;
+    // Final parse
+    parseAndRenderModules(fullText, true);
+    // Mark all tabs as done
+    document.querySelectorAll('.tab-btn').forEach(t=>t.classList.add('done'));
+    // Save to history
+    saveToHistory(state.currentPlan);
+    // Increment usage counter
+    if(!state.activated){
+      state.usageCount++;
+      localStorage.setItem('mg_usage', state.usageCount.toString());
+      updateUsageBadge();
+    }
+    toast('方案生成完成！','success');
+
+  } catch(err){
+    toast('生成失败：' + err.message, 'error');
+    console.error(err);
+  } finally {
+    state.isGenerating = false;
+    btn.disabled = false;
+    btn.innerHTML = '<span>🚀</span><span>开始生成增长方案</span>';
+  }
+}
+
+function parseAndRenderModules(text, isFinal=false){
+  const selectedMods = state.currentPlan.modules.map(id=>MODULES.find(m=>m.id===id));
+
+  for(const mod of selectedMods){
+    const patterns = [
+      new RegExp(`##\\s*${mod.id}[\\.、．]\\s*${mod.name}[\\s\\S]*?(?=##\\s*\\d+[\\.、．]|$)`),
+      new RegExp(`##\\s*${mod.name}[\\s\\S]*?(?=##|$)`),
+      new RegExp(`${mod.name}[\\s\\S]*?(?=##|$)`,'i')
+    ];
+
+    let match = null;
+    for(const p of patterns){
+      match = text.match(p);
+      if(match) break;
+    }
+
+    if(match){
+      let content = match[0].trim();
+      // Remove the heading line
+      content = content.replace(/^##\s*\d+[\.、．]\s*\S+\s*\n?/, '').replace(/^##\s*\S+\s*\n?/, '');
+      if(content.length > 10){
+        const el = document.getElementById('content-'+mod.id);
+        if(el){
+          el.innerHTML = renderMarkdown(content);
+          state.currentPlan.content[mod.id] = content;
+        }
+        const tabBtn = document.querySelector(`.tab-btn[data-tab="${mod.id}"]`);
+        if(tabBtn) tabBtn.classList.add('done');
+      }
+    }
+  }
+}
+
+// ===== Simple Markdown Renderer =====
+function renderMarkdown(text){
+  if(!text) return '';
+  let html = text
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic / emphasis
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Inline code
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    // Blockquote
+    .replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>')
+    // Unordered list
+    .replace(/^[-*]\s*(.+)$/gm, '<li>$1</li>')
+    // Ordered list
+    .replace(/^\d+\.\s*(.+)$/gm, '<li>$1</li>')
+    // Paragraphs
+    .replace(/\n\n/g, '</p><p>')
+    // Line breaks
+    .replace(/\n/g, '<br>');
+
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li>.*?<\/li>\s*(?:<br>)?)+)/g, '<ul>$1</ul>');
+  // Merge consecutive blockquotes
+  html = html.replace(/<\/blockquote>\s*(?:<br>)?\s*<blockquote>/g, '<br>');
+
+  return '<p>' + html + '</p>';
+}
+
+// ===== Tab Navigation =====
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${id}"]`)?.classList.add('active');
+  document.getElementById('panel-'+id)?.classList.add('active');
+}
+
+// ===== Export Functions =====
+function exportMarkdown(){
+  if(!state.currentPlan) return;
+  const plan = state.currentPlan;
+  let md = `# ${plan.name} - 招商增长方案\n\n`;
+  md += `> 类型：${plan.type} | 规模：${plan.scale} | 目标客户：${plan.audience}\n`;
+  md += `> 生成时间：${new Date(plan.createdAt).toLocaleString('zh-CN')}\n`;
+  md += `> 由 MeetGrow AI 会展招商增长智能体生成\n\n---\n\n`;
+
+  for(const id of plan.modules){
+    const mod = MODULES.find(m=>m.id===id);
+    const content = plan.content[id];
+    if(content){
+      md += `## ${mod.icon} ${mod.id}. ${mod.name}\n\n${content}\n\n---\n\n`;
+    }
+  }
+
+  downloadFile(md, `${plan.name}-增长方案.md`, 'text/markdown');
+  toast('Markdown文件已导出','success');
+}
+
+function exportWord(){
+  if(!state.currentPlan) return;
+  const plan = state.currentPlan;
+  let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>${plan.name}</title>
+<style>body{font-family:'Microsoft YaHei','SimSun',sans-serif;font-size:12pt;line-height:1.8;color:#333;padding:40px}
+h1{font-size:22pt;color:#0ea5e9;text-align:center;border-bottom:2px solid #0ea5e9;padding-bottom:10px}
+h2{font-size:16pt;color:#1e293b;margin-top:30px;border-left:4px solid #0ea5e9;padding-left:12px}
+h3{font-size:13pt;color:#334155;margin-top:16px}
+blockquote{border-left:3px solid #22c55e;padding:8px 16px;margin:10px 0;background:#f0fdf4;font-style:italic}
+ul,ol{margin-left:20px}li{margin-bottom:4px}
+strong{color:#0f172a}em{color:#0284c7;font-style:normal}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #e2e8f0;padding:8px 12px;text-align:left}
+th{background:#f1f5f9;font-weight:bold}
+.meta{text-align:center;color:#64748b;font-size:11pt;margin-bottom:30px}</style></head><body>`;
+
+  html += `<h1>🚀 ${plan.name}<br>招商增长方案</h1>`;
+  html += `<div class="meta">类型：${plan.type} | 规模：${plan.scale} | 目标客户：${plan.audience}<br>生成时间：${new Date(plan.createdAt).toLocaleString('zh-CN')} | MeetGrow AI 会展招商增长智能体</div>`;
+
+  for(const id of plan.modules){
+    const mod = MODULES.find(m=>m.id===id);
+    const content = plan.content[id];
+    if(content){
+      html += `<h2>${mod.icon} ${mod.id}. ${mod.name}</h2>`;
+      html += renderMarkdown(content);
+    }
+  }
+
+  html += '</body></html>';
+  downloadFile(html, `${plan.name}-增长方案.doc`, 'application/msword');
+  toast('Word文件已导出','success');
+}
+
+function downloadFile(content, filename, type){
+  const blob = new Blob([content], {type: type + ';charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyModule(id){
+  const content = state.currentPlan?.content[id];
+  if(!content){ toast('暂无内容可复制','error'); return; }
+  const mod = MODULES.find(m=>m.id===id);
+  navigator.clipboard.writeText(`# ${mod.name}\n\n${content}`).then(()=>{
+    toast(`已复制「${mod.name}」`,'success');
+  }).catch(()=>toast('复制失败，请手动选择复制','error'));
+}
+
+function copyAll(){
+  if(!state.currentPlan) return;
+  let all = '';
+  for(const id of state.currentPlan.modules){
+    const mod = MODULES.find(m=>m.id===id);
+    const content = state.currentPlan.content[id];
+    if(content) all += `# ${mod.name}\n\n${content}\n\n---\n\n`;
+  }
+  navigator.clipboard.writeText(all).then(()=>toast('已复制全部内容','success')).catch(()=>toast('复制失败，请手动选择复制','error'));
+}
+
+// ===== History =====
+function saveToHistory(plan){
+  state.history.unshift(plan);
+  if(state.history.length > 20) state.history = state.history.slice(0,20);
+  try {
+    localStorage.setItem('mg_history', JSON.stringify(state.history));
+  } catch(e) {
+    // If quota exceeded, remove oldest plans and retry
+    if(state.history.length > 5){
+      state.history = state.history.slice(0, Math.max(5, state.history.length - 5));
+      try { localStorage.setItem('mg_history', JSON.stringify(state.history)); } catch(e2){}
+    }
+    toast('存储空间不足，已自动清理旧方案','info');
+  }
+  updateHistoryCount();
+  renderSidebarHistory();
+}
+
+function updateHistoryCount(){
+  document.getElementById('history-count').textContent = state.history.length;
+  document.getElementById('nav-compare').style.display = state.history.length >= 2 ? 'flex' : 'none';
+}
+
+function renderSidebarHistory(){
+  const el = document.getElementById('sidebar-history');
+  el.innerHTML = state.history.slice(0,10).map(p=>`
+    <div class="history-item" onclick="loadPlan('${p.id}')">
+      <div class="h-title">${p.name}</div>
+      <div class="h-date">${new Date(p.createdAt).toLocaleDateString('zh-CN')}</div>
+    </div>
+  `).join('');
+}
+
+function renderHistoryGrid(){
+  const grid = document.getElementById('history-grid');
+  if(state.history.length === 0){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">暂无历史方案，去创建一个吧</div>';
+    return;
+  }
+  grid.innerHTML = state.history.map(p=>`
+    <div class="history-card ${state.compareSelections.includes(p.id)?'selected':''}"
+         onclick="${state.compareMode ? `toggleCompareSelect('${p.id}',this)` : `loadPlan('${p.id}')`}">
+      <h3>${p.name}</h3>
+      <div class="hc-meta">
+        <span>📅 ${new Date(p.createdAt).toLocaleDateString('zh-CN')}</span>
+        <span>📋 ${p.type}</span>
+        <span>📏 ${p.scale}</span>
+      </div>
+      <div class="hc-preview">${p.audience} | ${p.goals || '招商转化'}</div>
+      <div class="hc-actions" onclick="event.stopPropagation()">
+        <button class="btn-outline" onclick="loadPlan('${p.id}')">📖 查看</button>
+        <button class="btn-outline" onclick="exportPlanAs('${p.id}','md')">📝 MD</button>
+        <button class="btn-outline" onclick="exportPlanAs('${p.id}','doc')">📄 Word</button>
+        <button class="btn-outline" onclick="deletePlan('${p.id}')" style="color:var(--danger)">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadPlan(id){
+  const plan = state.history.find(p=>p.id===id);
+  if(!plan) return;
+  state.currentPlan = plan;
+  state.selectedModules = plan.modules.slice();
+  switchView('output');
+  document.getElementById('nav-output').style.display = 'flex';
+  document.getElementById('output-plan-title').textContent = plan.name;
+  document.getElementById('output-plan-meta').innerHTML =
+    `<span>📅 ${new Date(plan.createdAt).toLocaleDateString('zh-CN')}</span>
+     <span>📋 ${plan.type}</span><span>👥 ${plan.audience}</span><span>📏 ${plan.scale}</span>`;
+
+  const selectedMods = plan.modules.map(id=>MODULES.find(m=>m.id===id));
+  const tabsNav = document.getElementById('tabs-nav');
+  const tabsContent = document.getElementById('tabs-content');
+  tabsNav.innerHTML = selectedMods.map((m,i)=>`
+    <button class="tab-btn done ${i===0?'active':''}" data-tab="${m.id}" onclick="switchTab(${m.id})">
+      <span class="tab-num">${m.id}</span>${m.name}
+    </button>
+  `).join('');
+  tabsContent.innerHTML = selectedMods.map((m,i)=>`
+    <div class="tab-panel ${i===0?'active':''}" id="panel-${m.id}">
+      <div class="module-title">${m.icon} ${m.name}</div>
+      <button class="copy-btn" onclick="copyModule(${m.id})">📋 复制</button>
+      <div class="module-content" id="content-${m.id}">${renderMarkdown(plan.content[m.id] || '')}</div>
+    </div>
+  `).join('');
+}
+
+function deletePlan(id){
+  if(!confirm('确定删除这个方案吗？')) return;
+  state.history = state.history.filter(p=>p.id!==id);
+  localStorage.setItem('mg_history', JSON.stringify(state.history));
+  updateHistoryCount();
+  renderSidebarHistory();
+  renderHistoryGrid();
+  toast('方案已删除','info');
+}
+
+function clearHistory(){
+  if(!confirm('确定清空所有历史方案吗？此操作不可撤销。')) return;
+  state.history = [];
+  localStorage.removeItem('mg_history');
+  updateHistoryCount();
+  renderSidebarHistory();
+  renderHistoryGrid();
+  toast('历史已清空','info');
+}
+
+function exportPlanAs(id, format){
+  const plan = state.history.find(p=>p.id===id);
+  if(!plan) return;
+  const origPlan = state.currentPlan;
+  state.currentPlan = plan;
+  if(format==='md') exportMarkdown();
+  else exportWord();
+  state.currentPlan = origPlan;
+}
+
+// ===== Compare =====
+function toggleCompareMode(){
+  state.compareMode = !state.compareMode;
+  state.compareSelections = [];
+  const btn = document.getElementById('btn-compare-toggle');
+  btn.textContent = state.compareMode ? '✅ 选择方案进行对比' : '🔍 开启对比模式';
+  if(state.compareMode){
+    toast('请点击两个方案卡片进行选择','info');
+  }
+  renderHistoryGrid();
+}
+
+function toggleCompareSelect(id, el){
+  const idx = state.compareSelections.indexOf(id);
+  if(idx > -1){
+    state.compareSelections.splice(idx,1);
+    el.classList.remove('selected');
+  } else {
+    if(state.compareSelections.length >= 2){
+      toast('最多选择2个方案进行对比','error');
+      return;
+    }
+    state.compareSelections.push(id);
+    el.classList.add('selected');
+  }
+  if(state.compareSelections.length === 2){
+    switchView('compare');
+    state.compareMode = false;
+    state.compareSelections = [];
+  }
+}
+
+function initCompare(){
+  const selA = document.getElementById('compare-a');
+  const selB = document.getElementById('compare-b');
+  const opts = state.history.map(p=>`<option value="${p.id}">${p.name} (${new Date(p.createdAt).toLocaleDateString('zh-CN')})</option>`).join('');
+  selA.innerHTML = opts;
+  selB.innerHTML = opts;
+  if(state.history.length >= 2) selB.selectedIndex = 1;
+  renderCompare();
+}
+
+function renderCompare(){
+  const idA = document.getElementById('compare-a').value;
+  const idB = document.getElementById('compare-b').value;
+  const planA = state.history.find(p=>p.id===idA);
+  const planB = state.history.find(p=>p.id===idB);
+  if(!planA || !planB) return;
+
+  // Module selector
+  const modSel = document.getElementById('compare-module-select');
+  const commonModules = planA.modules.filter(id=>planB.modules.includes(id));
+  modSel.innerHTML = '<span style="font-size:13px;color:var(--text-muted);margin-right:8px">对比模块：</span>' +
+    commonModules.map((id,i)=>{
+      const m = MODULES.find(x=>x.id===id);
+      return `<button class="template-btn ${i===0?'active':''}" onclick="showCompareModule(${id},null,null,event)" style="${i===0?'border-color:var(--primary);background:var(--primary-light)':''}">${m.icon} ${m.name}</button>`;
+    }).join('');
+
+  if(commonModules.length > 0) showCompareModule(commonModules[0], planA, planB);
+}
+
+function showCompareModule(modId, planA, planB, evt){
+  planA = planA || state.history.find(p=>p.id===document.getElementById('compare-a').value);
+  planB = planB || state.history.find(p=>p.id===document.getElementById('compare-b').value);
+  const mod = MODULES.find(m=>m.id===modId);
+  const grid = document.getElementById('compare-grid');
+  grid.innerHTML = `
+    <div class="compare-panel">
+      <h3>📄 ${planA.name} - ${mod.name}</h3>
+      <div class="module-content">${renderMarkdown(planA.content[modId] || '暂无内容')}</div>
+    </div>
+    <div class="compare-panel">
+      <h3>📄 ${planB.name} - ${mod.name}</h3>
+      <div class="module-content">${renderMarkdown(planB.content[modId] || '暂无内容')}</div>
+    </div>
+  `;
+
+  // Highlight active button
+  document.querySelectorAll('#compare-module-select .template-btn').forEach(btn=>{
+    btn.style.borderColor = '';
+    btn.style.background = '';
+  });
+  if(evt && evt.currentTarget){
+    evt.currentTarget.style.borderColor = 'var(--primary)';
+    evt.currentTarget.style.background = 'var(--primary-light)';
+  }
+}
+
+// ===== Toast =====
+function toast(msg, type='info'){
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+// ===== Init =====
+init();
+</script>
+</body>
+</html>
