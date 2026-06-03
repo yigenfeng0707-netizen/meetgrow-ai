@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetGrow AI - 会展招商增长智能体 | 一键生成11模块招商增长闭环方案</title>
+<meta name="description" content="MeetGrow AI 会展招商增长智能体，输入活动信息，1-3分钟自动生成从定位、招商、传播到转化的完整11模块增长方案。支持通义千问、DeepSeek等6大国产AI模型。">
+<meta name="keywords" content="会展招商,AI招商,招商方案,峰会招商,活动增长,智能体,大会招商,赞助方案">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.8em%22 font-size=%2280%22>🚀</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#0ea5e9;--primary-dark:#0284c7;
+  --accent:#22c55e;--accent-dark:#16a34a;
+  --purple:#a855f7;--pink:#ec4899;--amber:#f59e0b;
+  --bg:#030712;--bg-card:#0f172a;--bg-card-hover:#1e293b;
+  --surface:#1e293b;--surface-alt:#111827;
+  --text:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --border:#1e293b;--border-light:#334155;
+  --gradient-primary:linear-gradient(135deg,#0ea5e9,#22c55e);
+  --gradient-accent:linear-gradient(135deg,#a855f7,#ec4899);
+  --gradient-warm:linear-gradient(135deg,#f59e0b,#ef4444);
+  --radius:16px;--radius-sm:10px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* ===== NAV ===== */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;transition:all .3s ease;backdrop-filter:blur(0)}
+nav.scrolled{background:rgba(3,7,18,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:12px 0}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700}
+.nav-logo span:first-child{font-size:26px}
+.nav-logo-text{background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:14px;color:var(--text-secondary);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:8px 24px;border-radius:20px;background:var(--gradient-primary);color:#fff;font-size:14px;font-weight:600;transition:all .3s;border:none;cursor:pointer}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(14,165,233,.4)}
+
+/* ===== HERO ===== */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(14,165,233,.12) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(34,197,94,.1) 0%,transparent 50%),radial-gradient(circle at 50% 30%,rgba(168,85,247,.08) 0%,transparent 50%);animation:bgRotate 30s linear infinite}
+@keyframes bgRotate{to{transform:rotate(360deg)}}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%)}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(120px);opacity:.15}
+.hero-glow-1{top:-200px;left:10%;background:var(--primary)}
+.hero-glow-2{bottom:-200px;right:10%;background:var(--accent)}
+.hero-content{position:relative;z-index:2;max-width:800px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);font-size:13px;color:var(--primary);margin-bottom:28px;backdrop-filter:blur(8px)}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:800;line-height:1.15;margin-bottom:24px;letter-spacing:-1px}
+.hero h1 .gradient{background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1 .gradient2{background:var(--gradient-accent);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-desc{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto 40px;line-height:1.8}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-hero{padding:16px 40px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-hero-primary{background:var(--gradient-primary);color:#fff;box-shadow:0 4px 30px rgba(14,165,233,.3)}
+.btn-hero-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(14,165,233,.45)}
+.btn-hero-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px)}
+.btn-hero-secondary:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:48px;justify-content:center;margin-top:64px;padding-top:48px;border-top:1px solid rgba(255,255,255,.06)}
+.hero-stat .num{font-size:36px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stat .label{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* ===== SECTION COMMON ===== */
+section{padding:100px 0;position:relative}
+.section-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.section-title{font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:16px;letter-spacing:-0.5px}
+.section-desc{font-size:16px;color:var(--text-secondary);max-width:600px;line-height:1.8}
+.section-header{text-align:center;margin-bottom:64px}
+.section-header .section-desc{margin:0 auto}
+
+/* ===== FEATURES ===== */
+.features{background:var(--surface-alt)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:all .4s ease;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gradient-primary);opacity:0;transition:opacity .3s}
+.feature-card:hover{border-color:var(--border-light);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.feature-card:hover::before{opacity:1}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:20px}
+.feature-card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+.feature-card p{font-size:14px;color:var(--text-secondary);line-height:1.7}
+
+/* ===== MODULES ===== */
+.modules{background:var(--bg)}
+.modules-timeline{display:grid;grid-template-columns:1fr 1fr;gap:0;position:relative}
+.modules-timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--primary),var(--accent),var(--purple),var(--pink));border-radius:1px}
+.module-item{display:flex;align-items:flex-start;gap:20px;padding:24px 0;position:relative}
+.module-item:nth-child(odd){flex-direction:row-reverse;text-align:right;padding-right:48px}
+.module-item:nth-child(even){padding-left:48px}
+.module-num{width:40px;height:40px;border-radius:50%;background:var(--bg-card);border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--primary);flex-shrink:0;position:relative;z-index:2}
+.module-item:nth-child(3n+2) .module-num{border-color:var(--accent);color:var(--accent)}
+.module-item:nth-child(3n) .module-num{border-color:var(--purple);color:var(--purple)}
+.module-content{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 24px;flex:1;transition:all .3s}
+.module-content:hover{border-color:var(--border-light);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.module-content h4{font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.module-item:nth-child(odd) .module-content h4{justify-content:flex-end}
+.module-content p{font-size:13px;color:var(--text-secondary);line-height:1.7}
+
+/* ===== AI MODELS ===== */
+.ai-models{background:var(--surface-alt)}
+.models-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.model-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;transition:all .4s;position:relative;overflow:hidden}
+.model-card:hover{border-color:var(--border-light);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.model-card .model-icon{font-size:36px;margin-bottom:14px}
+.model-card h4{font-size:16px;font-weight:700;margin-bottom:6px}
+.model-card .model-models{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+.model-card .model-tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
+
+/* ===== DEMO ===== */
+.demo{background:var(--bg);position:relative;overflow:hidden}
+.demo::before{content:'';position:absolute;top:50%;left:50%;width:800px;height:800px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(14,165,233,.06) 0%,transparent 70%);pointer-events:none}
+.demo-window{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:960px;margin:0 auto;box-shadow:0 25px 60px rgba(0,0,0,.4)}
+.demo-titlebar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border)}
+.demo-dots{display:flex;gap:6px}
+.demo-dot{width:12px;height:12px;border-radius:50%}
+.demo-dot:nth-child(1){background:#ef4444}
+.demo-dot:nth-child(2){background:#f59e0b}
+.demo-dot:nth-child(3){background:#22c55e}
+.demo-url{flex:1;text-align:center;font-size:12px;color:var(--text-muted);padding:4px 12px;background:rgba(255,255,255,.03);border-radius:6px}
+.demo-body{padding:32px;display:grid;grid-template-columns:1fr 1.5fr;gap:24px;min-height:360px}
+.demo-sidebar{display:flex;flex-direction:column;gap:12px}
+.demo-sidebar-title{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.demo-module{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--text-secondary);transition:all .2s;cursor:default}
+.demo-module.active{background:rgba(14,165,233,.1);color:var(--primary)}
+.demo-module .dm-icon{font-size:14px}
+.demo-output{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px}
+.demo-output h4{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--primary)}
+.demo-output .typing-line{height:14px;border-radius:4px;margin-bottom:10px;animation:shimmer 2s ease infinite}
+.demo-output .typing-line:nth-child(2){width:90%}
+.demo-output .typing-line:nth-child(3){width:75%}
+.demo-output .typing-line:nth-child(4){width:85%}
+.demo-output .typing-line:nth-child(5){width:60%}
+.demo-output .typing-line:nth-child(6){width:95%}
+.demo-output .typing-line:nth-child(7){width:70%}
+.demo-output .typing-line:nth-child(8){width:80%}
+@keyframes shimmer{0%,100%{background:rgba(255,255,255,.03)}50%{background:rgba(14,165,233,.08)}}
+.demo-output .typed-text{font-size:13px;color:var(--text-secondary);line-height:1.8}
+.demo-output .typed-text strong{color:var(--text)}
+.demo-output .typed-text .highlight{color:var(--primary);font-weight:600}
+
+/* ===== PRICING ===== */
+.pricing{background:var(--surface-alt)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:960px;margin:0 auto}
+.price-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:36px;text-align:center;transition:all .4s;position:relative}
+.price-card.featured{border-color:var(--primary);box-shadow:0 0 40px rgba(14,165,233,.15)}
+.price-card.featured::before{content:'最受欢迎';position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:4px 16px;border-radius:10px;background:var(--gradient-primary);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+.price-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.price-card .plan-name{font-size:18px;font-weight:700;margin-bottom:8px}
+.price-card .plan-price{font-size:48px;font-weight:800;margin-bottom:4px}
+.price-card .plan-price .currency{font-size:20px;vertical-align:top;margin-right:2px}
+.price-card .plan-price .period{font-size:14px;color:var(--text-muted);font-weight:400}
+.price-card .plan-desc{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+.price-card .plan-features{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.price-card .plan-features .pf-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary)}
+.price-card .plan-features .pf-check{color:var(--accent);font-weight:700;font-size:16px}
+.price-card .plan-btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;border:none;display:block;text-align:center}
+.price-card .plan-btn-primary{background:var(--gradient-primary);color:#fff}
+.price-card .plan-btn-primary:hover{box-shadow:0 4px 20px rgba(14,165,233,.4)}
+.price-card .plan-btn-outline{background:transparent;border:1.5px solid var(--border-light);color:var(--text)}
+.price-card .plan-btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ===== SCENARIOS ===== */
+.scenarios{background:var(--bg)}
+.scenarios-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.scenario-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center;transition:all .4s}
+.scenario-card:hover{border-color:var(--border-light);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.3)}
+.scenario-card .sc-icon{font-size:40px;margin-bottom:16px}
+.scenario-card h4{font-size:16px;font-weight:700;margin-bottom:8px}
+.scenario-card p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
+/* ===== STEPS ===== */
+.steps{background:var(--surface-alt)}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+.steps-row::before{content:'';position:absolute;top:36px;left:12%;right:12%;height:2px;background:linear-gradient(to right,var(--primary),var(--accent),var(--purple),var(--pink))}
+.step-item{text-align:center;position:relative}
+.step-num{width:72px;height:72px;border-radius:50%;background:var(--bg-card);border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--primary);margin:0 auto 20px;position:relative;z-index:2}
+.step-item:nth-child(2) .step-num{border-color:var(--accent);color:var(--accent)}
+.step-item:nth-child(3) .step-num{border-color:var(--purple);color:var(--purple)}
+.step-item:nth-child(4) .step-num{border-color:var(--pink);color:var(--pink)}
+.step-item h4{font-size:16px;font-weight:700;margin-bottom:8px}
+.step-item p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
+/* ===== FAQ ===== */
+.faq{background:var(--bg)}
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:all .3s}
+.faq-item.open{border-color:var(--border-light)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;cursor:pointer;font-size:15px;font-weight:600;transition:color .2s}
+.faq-q:hover{color:var(--primary)}
+.faq-arrow{font-size:18px;color:var(--text-muted);transition:transform .3s}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--primary)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease}
+.faq-item.open .faq-a{max-height:300px;padding:0 24px 20px}
+.faq-a p{font-size:14px;color:var(--text-secondary);line-height:1.8}
+
+/* ===== CTA ===== */
+.cta-section{background:var(--bg);padding:100px 0;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,165,233,.08) 0%,transparent 60%)}
+.cta-box{position:relative;z-index:2;max-width:640px;margin:0 auto}
+.cta-box h2{font-size:clamp(28px,4vw,40px);font-weight:800;margin-bottom:16px}
+.cta-box p{font-size:16px;color:var(--text-secondary);margin-bottom:36px;line-height:1.8}
+.cta-contact{display:flex;gap:24px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.cta-contact-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary);padding:8px 20px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.cta-contact-item strong{color:var(--text)}
+
+/* ===== FOOTER ===== */
+footer{background:var(--surface-alt);border-top:1px solid var(--border);padding:48px 0 32px;text-align:center}
+footer p{font-size:13px;color:var(--text-muted);line-height:2}
+footer a{color:var(--primary);transition:opacity .2s}
+footer a:hover{opacity:.8}
+
+/* ===== ANIMATIONS ===== */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .features-grid,.models-grid{grid-template-columns:repeat(2,1fr)}
+  .scenarios-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-row{grid-template-columns:repeat(2,1fr);gap:32px}
+  .steps-row::before{display:none}
+  .modules-timeline{grid-template-columns:1fr}
+  .modules-timeline::before{left:20px}
+  .module-item:nth-child(odd){flex-direction:row;text-align:left;padding-right:0;padding-left:48px}
+  .module-item:nth-child(odd) .module-content h4{justify-content:flex-start}
+  .module-item:nth-child(even){padding-left:48px}
+  .module-num{position:absolute;left:0}
+}
+@media(max-width:768px){
+  .features-grid,.models-grid,.pricing-grid,.scenarios-grid,.steps-row{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hero-stats{flex-direction:column;gap:24px}
+  .demo-body{grid-template-columns:1fr}
+  .demo-sidebar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span>🚀</span>
+      <span class="nav-logo-text">MeetGrow AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">核心功能</a>
+      <a href="#modules">11大模块</a>
+      <a href="#models">AI模型</a>
+      <a href="#pricing">价格方案</a>
+      <a href="#faq">常见问题</a>
+    </div>
+    <a href="https://yigenfeng0707-netizen.github.io/meetgrow-ai/" target="_blank" class="nav-cta">免费体验</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      AI 驱动 · 会展招商新范式
+    </div>
+    <h1>
+      <span class="gradient">一键生成</span>大会招商<br>
+      <span class="gradient2">增长闭环方案</span>
+    </h1>
+    <p class="hero-desc">
+      输入活动基本信息，AI 在 <strong>1-3 分钟</strong>内自动生成从定位、招商、传播到转化的完整 <strong>11 模块</strong>增长方案。<br>让每一场活动都实现招商最大化。
+    </p>
+    <div class="hero-actions">
+      <a href="https://yigenfeng0707-netizen.github.io/meetgrow-ai/" target="_blank" class="btn-hero btn-hero-primary">🚀 立即免费体验</a>
+      <a href="#demo" class="btn-hero btn-hero-secondary">📊 查看产品演示</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">11</div>
+        <div class="label">核心输出模块</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">6</div>
+        <div class="label">国产AI模型支持</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">1-3</div>
+        <div class="label">分钟生成方案</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">3</div>
+        <div class="label">次免费试用</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(14,165,233,.1);color:var(--primary)">核心优势</div>
+      <h2 class="section-title">为什么选择 MeetGrow AI</h2>
+      <p class="section-desc">专为会展招商场景深度优化的 AI 智能体，不是通用 ChatGPT 套壳，而是冠军级招商方法论的数字化落地</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon" style="background:rgba(14,165,233,.1);color:var(--primary)">⚡</div>
+        <h3>极速生成</h3>
+        <p>传统人工撰写招商方案需要数天，MeetGrow AI 仅需 1-3 分钟即可输出完整的 11 模块增长方案，效率提升 100 倍以上。</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon" style="background:rgba(34,197,94,.1);color:var(--accent)">🎯</div>
+        <h3>冠军级方法论</h3>
+        <p>内置经过实战验证的招商增长方法论，每个模块包含具体分析、话术模板和执行清单，拿来即用，质量稳定可靠。</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">🔌</div>
+        <h3>6大AI模型自由切换</h3>
+        <p>支持通义千问、DeepSeek、智谱AI、Moonshot、文心一言等主流国产模型，用户可根据预算和偏好自主选择。</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon" style="background:rgba(236,72,153,.1);color:var(--pink)">📤</div>
+        <h3>多格式一键导出</h3>
+        <p>支持导出为 Word、Markdown、PDF 等格式，方便在微信、飞书、PPT 等各种场景中直接使用方案内容。</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon" style="background:rgba(245,158,11,.1);color:var(--amber)">🔒</div>
+        <h3>数据安全私密</h3>
+        <p>所有数据保存在浏览器本地，API Key 不上传任何服务器。唯一的外部通信仅为您选择的 AI 模型接口。</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon" style="background:rgba(14,165,233,.1);color:var(--primary)">📱</div>
+        <h3>零安装即开即用</h3>
+        <p>纯 Web 应用架构，打开浏览器即可使用，无需安装任何软件。电脑、平板、手机全平台兼容。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 MODULES -->
+<section class="modules" id="modules">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(34,197,94,.1);color:var(--accent)">完整闭环</div>
+      <h2 class="section-title">11 大核心输出模块</h2>
+      <p class="section-desc">覆盖活动从策划到成交的全链路，每个模块独立完整、可直接落地执行</p>
+    </div>
+    <div class="modules-timeline">
+      <div class="module-item reveal">
+        <div class="module-num">1</div>
+        <div class="module-content">
+          <h4>🎯 大会定位</h4>
+          <p>明确活动核心价值主张、差异化定位和市场切入点，包含竞品活动对比与品牌调性定义</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">2</div>
+        <div class="module-content">
+          <h4>👥 目标客户画像</h4>
+          <p>精准描绘目标参会人群特征，包含行业/职位/收入分析、核心痛点、决策路径与触达渠道</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">3</div>
+        <div class="module-content">
+          <h4>💎 核心卖点</h4>
+          <p>提炼 3-5 个活动核心吸引力要素，每个卖点包含 FAB 话术和差异化受众匹配</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">4</div>
+        <div class="module-content">
+          <h4>🤝 招商合作方案</h4>
+          <p>设计冠名/钻石/金牌/银牌等多层次赞助体系，含各层级权益清单、定价与 ROI 测算</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">5</div>
+        <div class="module-content">
+          <h4>📋 赞助权益设计</h4>
+          <p>量化赞助商投入产出比，包含曝光量/线索量/签约量等 KPI 承诺和权益兑现清单</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">6</div>
+        <div class="module-content">
+          <h4>🎤 嘉宾邀约话术</h4>
+          <p>高转化率嘉宾邀约方案，含目标画像、电话/微信/邮件话术模板和拒绝应对策略</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">7</div>
+        <div class="module-content">
+          <h4>📱 朋友圈文案</h4>
+          <p>预热期/爆发期/收尾期系列化社交传播素材，至少 10 条图文模板和传播排期表</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">8</div>
+        <div class="module-content">
+          <h4>🎬 短视频脚本</h4>
+          <p>完整短视频内容创作方案，含 5+ 视频选题矩阵、脚本模板和发布推广策略</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">9</div>
+        <div class="module-content">
+          <h4>💬 社群运营SOP</h4>
+          <p>社群全周期运营手册，含搭建流程、每日内容排期、互动活动和付费转化路径</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">10</div>
+        <div class="module-content">
+          <h4>📊 客户分层跟进</h4>
+          <p>ABC 三级客户分层体系，含分级标准、各层跟进频率话术和线索分配机制</p>
+        </div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">11</div>
+        <div class="module-content">
+          <h4>💰 会后成交话术</h4>
+          <p>会后 48 小时黄金跟进流程，含不同类型客户话术模板、异议处理和转介绍激励</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI MODELS -->
+<section class="ai-models" id="models">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(168,85,247,.1);color:var(--purple)">灵活适配</div>
+      <h2 class="section-title">支持 6 大国产 AI 模型</h2>
+      <p class="section-desc">用户可自主选择偏好的 AI 服务商，每位新用户都有免费额度，零成本上手</p>
+    </div>
+    <div class="models-grid">
+      <div class="model-card reveal reveal-delay-1">
+        <div class="model-icon">🧠</div>
+        <h4>通义千问</h4>
+        <div class="model-models">Qwen Plus / Max / Turbo</div>
+        <span class="model-tag" style="background:rgba(14,165,233,.1);color:var(--primary)">推荐首选</span>
+      </div>
+      <div class="model-card reveal reveal-delay-2">
+        <div class="model-icon">🔮</div>
+        <h4>智谱 AI</h4>
+        <div class="model-models">GLM-4-Plus / GLM-4 / Flash</div>
+        <span class="model-tag" style="background:rgba(34,197,94,.1);color:var(--accent)">Flash版免费</span>
+      </div>
+      <div class="model-card reveal reveal-delay-3">
+        <div class="model-icon">🌙</div>
+        <h4>Moonshot</h4>
+        <div class="model-models">32K / 128K / 8K</div>
+        <span class="model-tag" style="background:rgba(168,85,247,.1);color:var(--purple)">长文本强</span>
+      </div>
+      <div class="model-card reveal reveal-delay-1">
+        <div class="model-icon">🔍</div>
+        <h4>DeepSeek</h4>
+        <div class="model-models">Chat / Reasoner</div>
+        <span class="model-tag" style="background:rgba(245,158,11,.1);color:var(--amber)">极致低价</span>
+      </div>
+      <div class="model-card reveal reveal-delay-2">
+        <div class="model-icon">🐾</div>
+        <h4>文心一言</h4>
+        <div class="model-models">ERNIE 4.0 / 3.5 / Speed</div>
+        <span class="model-tag" style="background:rgba(236,72,153,.1);color:var(--pink)">百度生态</span>
+      </div>
+      <div class="model-card reveal reveal-delay-3">
+        <div class="model-icon">⚙️</div>
+        <h4>自定义</h4>
+        <div class="model-models">任何 OpenAI 兼容模型</div>
+        <span class="model-tag" style="background:rgba(100,116,139,.1);color:var(--text-secondary)">私有部署</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(236,72,153,.1);color:var(--pink)">产品演示</div>
+      <h2 class="section-title">看看方案是如何生成的</h2>
+      <p class="section-desc">AI 实时流式输出，每个模块的内容都经过深度优化，包含话术模板和执行清单</p>
+    </div>
+    <div class="demo-window reveal">
+      <div class="demo-titlebar">
+        <div class="demo-dots"><div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot"></div></div>
+        <div class="demo-url">yigenfeng0707-netizen.github.io/meetgrow-ai</div>
+      </div>
+      <div class="demo-body">
+        <div class="demo-sidebar">
+          <div class="demo-sidebar-title">方案模块</div>
+          <div class="demo-module active"><span class="dm-icon">🎯</span> 大会定位</div>
+          <div class="demo-module"><span class="dm-icon">👥</span> 目标客户画像</div>
+          <div class="demo-module"><span class="dm-icon">💎</span> 核心卖点</div>
+          <div class="demo-module"><span class="dm-icon">🤝</span> 招商合作方案</div>
+          <div class="demo-module"><span class="dm-icon">📋</span> 赞助权益设计</div>
+          <div class="demo-module"><span class="dm-icon">🎤</span> 嘉宾邀约话术</div>
+          <div class="demo-module"><span class="dm-icon">📱</span> 朋友圈文案</div>
+          <div class="demo-module"><span class="dm-icon">🎬</span> 短视频脚本</div>
+          <div class="demo-module"><span class="dm-icon">💬</span> 社群运营SOP</div>
+          <div class="demo-module"><span class="dm-icon">📊</span> 客户分层跟进</div>
+          <div class="demo-module"><span class="dm-icon">💰</span> 会后成交话术</div>
+        </div>
+        <div class="demo-output">
+          <h4>🎯 模块一：大会定位</h4>
+          <div class="typed-text" id="demoText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIOS -->
+<section class="scenarios" id="scenarios">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(245,158,11,.1);color:var(--amber)">适用场景</div>
+      <h2 class="section-title">覆盖全类型活动场景</h2>
+      <p class="section-desc">无论是千人峰会还是小型沙龙，都能生成精准匹配的招商增长方案</p>
+    </div>
+    <div class="scenarios-grid">
+      <div class="scenario-card reveal reveal-delay-1">
+        <div class="sc-icon">🏢</div>
+        <h4>大会 / 峰会</h4>
+        <p>AI峰会、行业年会、科技大会等大型活动的招商赞助与门票销售方案</p>
+      </div>
+      <div class="scenario-card reveal reveal-delay-2">
+        <div class="sc-icon">🏭</div>
+        <h4>园区招商</h4>
+        <p>产业园、科技园招商推介会，助力园区入驻企业招引和产业基金对接</p>
+      </div>
+      <div class="scenario-card reveal reveal-delay-3">
+        <div class="sc-icon">📚</div>
+        <h4>培训会 / 训练营</h4>
+        <p>企业培训、实战训练营，设计从免费公开课到付费课程的转化路径</p>
+      </div>
+      <div class="scenario-card reveal reveal-delay-4">
+        <div class="sc-icon">🍷</div>
+        <h4>沙龙 / 私享会</h4>
+        <p>高端闭门沙龙、行业论坛，强调圈层价值，实现品牌合作与咨询转化</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="steps" id="steps">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(14,165,233,.1);color:var(--primary)">快速上手</div>
+      <h2 class="section-title">4 步生成招商增长方案</h2>
+      <p class="section-desc">从零到完整方案，只需 4 个简单步骤</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-item reveal reveal-delay-1">
+        <div class="step-num">1</div>
+        <h4>获取 API Key</h4>
+        <p>从通义千问、DeepSeek 等任一 AI 服务商免费注册获取 API Key</p>
+      </div>
+      <div class="step-item reveal reveal-delay-2">
+        <div class="step-num">2</div>
+        <h4>填写活动信息</h4>
+        <p>输入活动名称、类型、目标受众、规模等基本信息</p>
+      </div>
+      <div class="step-item reveal reveal-delay-3">
+        <div class="step-num">3</div>
+        <h4>AI 智能生成</h4>
+        <p>点击生成按钮，AI 在 1-3 分钟内输出完整 11 模块方案</p>
+      </div>
+      <div class="step-item reveal reveal-delay-4">
+        <div class="step-num">4</div>
+        <h4>导出使用</h4>
+        <p>一键导出 Word/Markdown/PDF，直接用于招商执行</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(34,197,94,.1);color:var(--accent)">价格方案</div>
+      <h2 class="section-title">简单透明的定价</h2>
+      <p class="section-desc">免费试用 3 次，满意后再订阅。无隐藏费用，有效期内无限次使用</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal reveal-delay-1">
+        <div class="plan-name">免费体验</div>
+        <div class="plan-price"><span class="currency">¥</span>0</div>
+        <div class="plan-desc">免费试用 3 次完整方案</div>
+        <div class="plan-features">
+          <div class="pf-item"><span class="pf-check">✓</span> 完整 11 模块输出</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 所有 AI 模型可选</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 多格式导出</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 3 次免费生成</div>
+        </div>
+        <a href="https://yigenfeng0707-netizen.github.io/meetgrow-ai/" target="_blank" class="plan-btn plan-btn-outline">立即体验</a>
+      </div>
+      <div class="price-card featured reveal reveal-delay-2">
+        <div class="plan-name">个人版</div>
+        <div class="plan-price"><span class="currency">¥</span>3,999<span class="period"> /年</span></div>
+        <div class="plan-desc">有效期内无限次使用</div>
+        <div class="plan-features">
+          <div class="pf-item"><span class="pf-check">✓</span> 无限次方案生成</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 完整 11 模块输出</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 所有 AI 模型可选</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 方案对比功能</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 历史记录管理</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 多格式导出</div>
+        </div>
+        <a href="#cta" class="plan-btn plan-btn-primary">获取激活码</a>
+      </div>
+      <div class="price-card reveal reveal-delay-3">
+        <div class="plan-name">企业团购</div>
+        <div class="plan-price" style="font-size:36px">定制<span class="period"> 优惠</span></div>
+        <div class="plan-desc">5人起购，最高享7折</div>
+        <div class="plan-features">
+          <div class="pf-item"><span class="pf-check">✓</span> 包含个人版全部功能</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 5人团购 8 折</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 20人团购 7 折</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 专属客服支持</div>
+          <div class="pf-item"><span class="pf-check">✓</span> 批量激活码管理</div>
+        </div>
+        <a href="#cta" class="plan-btn plan-btn-outline">联系我们</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(100,116,139,.1);color:var(--text-secondary)">帮助中心</div>
+      <h2 class="section-title">常见问题</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>API Key 是什么？如何获取？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>API Key 是 AI 服务商提供的访问凭证。MeetGrow AI 支持通义千问、DeepSeek、智谱AI 等 6 家国产模型，您只需在对应平台注册账号即可免费获取。设置页面有详细的获取教程和直达链接。新用户通常都有免费额度，可以零成本试用。</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>生成一次方案要花多少钱？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>以 DeepSeek 为例，生成一次完整 11 模块方案的费用约 0.01-0.05 元（不到一毛钱）。通义千问和智谱 AI 的新用户免费额度通常可以生成数十次方案。AI 模型的使用成本极低，远低于人工撰写的时间成本。</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>方案生成不完整怎么办？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>MeetGrow AI 内置了智能续传机制。如果 AI 输出中途停止或遗漏了某些模块，系统会自动检测并发起续传请求，确保最终输出完整的 11 个模块。您无需手动干预。</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>我的数据安全吗？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>所有数据（API Key、活动信息、方案内容）均保存在您浏览器的本地存储中，不会上传到任何第三方服务器。唯一的外部通信是向您选择的 AI 服务商发送活动信息以生成方案。</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>支持哪些活动类型？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>MeetGrow AI 适用于大会/峰会、沙龙/论坛、培训会/训练营、园区招商推介会、行业年会等各种活动类型。产品内置了 4 种场景的快速模板，您也可以自定义输入任意活动信息。</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span>可以接入自己部署的大模型吗？</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a"><p>可以。在设置中选择「自定义」服务商，填入您私有化部署模型的 Base URL、模型名称和 API Key 即可。前提是该模型提供 OpenAI 兼容的 API 接口。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="container">
+    <div class="cta-box reveal">
+      <h2>开始用 AI 驱动<br>您的招商增长</h2>
+      <p>免费试用 3 次完整方案生成，体验冠军级招商方法论的威力。<br>满意后再订阅，零风险上手。</p>
+      <div class="hero-actions">
+        <a href="https://yigenfeng0707-netizen.github.io/meetgrow-ai/" target="_blank" class="btn-hero btn-hero-primary">🚀 免费开始使用</a>
+        <a href="MeetGrow_AI_User_Manual.docx" download class="btn-hero btn-hero-secondary">📖 下载使用手册</a>
+      </div>
+      <div class="cta-contact">
+        <div class="cta-contact-item">
+          📞 微信/电话：<strong>18969081266</strong>
+        </div>
+        <div class="cta-contact-item">
+          🏢 企业团购享 <strong>7-8折</strong> 优惠
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)">
+      <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent">MeetGrow AI</span>
+      &nbsp;会展招商增长智能体
+    </p>
+    <p>让每一场活动都实现招商最大化</p>
+    <p style="margin-top:16px">
+      <a href="https://yigenfeng0707-netizen.github.io/meetgrow-ai/" target="_blank">在线体验</a>
+      &nbsp;·&nbsp;
+      <a href="MeetGrow_AI_User_Manual.docx" download>使用手册</a>
+      &nbsp;·&nbsp;
+      联系我们：18969081266
+    </p>
+    <p style="margin-top:24px;font-size:12px;color:var(--text-muted)">&copy; 2026 MeetGrow AI. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// FAQ toggle
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Demo typing effect
+const demoLines = [
+  '<strong>一、核心价值主张</strong>',
+  '',
+  '本次大会定位为 <span class="highlight">"2026 企业 AI 落地增长峰会"</span>，',
+  '聚焦传统制造业与中小企业的 <strong>AI 实战落地</strong>，',
+  '区别于市面上的概念分享型会议。',
+  '',
+  '<strong>二、差异化定位</strong>',
+  '',
+  '▸ 竞品分析：当前市场 AI 峰会多为技术导向，缺少商业闭环',
+  '▸ 我们的切入：<strong>80% 实战案例 + 20% 方法论</strong>',
+  '▸ 独特价值：现场签约对接，实现 <span class="highlight">"听完即用"</span>',
+  '',
+  '<strong>三、目标市场容量</strong>',
+  '',
+  '▸ 核心受众：年产值 5000 万以上的传统企业主',
+  '▸ 潜在规模：全国符合条件的企业约 <strong>12.6 万家</strong>',
+  '▸ 预计触达：通过线上线下组合传播覆盖 <strong>5 万+</strong> 目标人群'
+];
+
+const demoEl = document.getElementById('demoText');
+let lineIdx = 0, charIdx = 0, currentHTML = '';
+
+function typeDemo() {
+  if (lineIdx >= demoLines.length) {
+    setTimeout(() => { lineIdx = 0; charIdx = 0; currentHTML = ''; demoEl.innerHTML = ''; typeDemo(); }, 3000);
+    return;
+  }
+  const line = demoLines[lineIdx];
+  if (line === '') {
+    currentHTML += '<br>';
+    demoEl.innerHTML = currentHTML + '<span style="border-right:2px solid var(--primary);animation:blink 1s step-end infinite">&nbsp;</span>';
+    lineIdx++;
+    setTimeout(typeDemo, 100);
+    return;
+  }
+  if (charIdx < line.length) {
+    // Handle HTML tags - add them all at once
+    if (line[charIdx] === '<') {
+      const closeIdx = line.indexOf('>', charIdx);
+      if (closeIdx !== -1) {
+        currentHTML += line.substring(charIdx, closeIdx + 1);
+        charIdx = closeIdx + 1;
+      } else {
+        currentHTML += line[charIdx];
+        charIdx++;
+      }
+    } else {
+      currentHTML += line[charIdx];
+      charIdx++;
+    }
+    demoEl.innerHTML = currentHTML + '<span style="border-right:2px solid var(--primary);animation:blink 1s step-end infinite">&nbsp;</span>';
+    setTimeout(typeDemo, line[charIdx-1] === '>' ? 0 : 25 + Math.random() * 20);
+  } else {
+    currentHTML += '<br>';
+    lineIdx++;
+    charIdx = 0;
+    setTimeout(typeDemo, 150);
+  }
+}
+
+// Add blink keyframe
+const style = document.createElement('style');
+style.textContent = '@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}';
+document.head.appendChild(style);
+
+// Start typing when demo section is visible
+const demoObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    typeDemo();
+    demoObserver.disconnect();
+  }
+}, { threshold: 0.3 });
+demoObserver.observe(document.getElementById('demo'));
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>
