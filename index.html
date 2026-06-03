@@ -477,17 +477,18 @@ input,textarea,select{font-family:inherit;outline:none}
 <div class="modal-overlay" id="modal-activation">
   <div class="modal" style="width:460px">
     <h2>🔑 激活产品</h2>
-    <p class="modal-desc">免费体验次数已用完，请输入激活码解锁无限使用。</p>
+    <p class="modal-desc">免费体验次数已用完，请输入激活码解锁完整功能。</p>
     <div class="activation-info">
       <div class="activation-price">
-        <span class="price-tag">¥99</span>
-        <span class="price-unit">/ 永久激活</span>
+        <span class="price-tag">¥3999</span>
+        <span class="price-unit">/ 个人版 · 年</span>
       </div>
       <div class="activation-features">
-        <div class="af-item">✅ 无限次生成招商方案</div>
+        <div class="af-item">✅ 全年无限次生成招商方案</div>
         <div class="af-item">✅ 全部11个输出模块</div>
         <div class="af-item">✅ 导出Word/Markdown/PDF</div>
         <div class="af-item">✅ 历史方案管理与对比</div>
+        <div class="af-item">✅ 支持6大国产AI模型自由切换</div>
       </div>
     </div>
     <div class="form-group" style="margin-top:20px">
@@ -509,16 +510,16 @@ input,textarea,select{font-family:inherit;outline:none}
   <div class="modal" style="width:420px;text-align:center">
     <div style="font-size:48px;margin-bottom:12px">🚀</div>
     <h2>免费体验次数已用完</h2>
-    <p class="modal-desc" style="margin-bottom:20px">您已免费生成 <strong>3</strong> 次方案。激活后可无限使用全部功能。</p>
+    <p class="modal-desc" style="margin-bottom:20px">您已免费生成 <strong>3</strong> 次方案。升级个人版可全年无限使用。</p>
     <div class="activation-info" style="text-align:left">
       <div class="activation-price" style="justify-content:center">
-        <span class="price-tag">¥99</span>
-        <span class="price-unit">/ 永久激活</span>
+        <span class="price-tag">¥3999</span>
+        <span class="price-unit">/ 个人版 · 年</span>
       </div>
       <div class="activation-features">
-        <div class="af-item">✅ 无限次生成 · 全11模块</div>
+        <div class="af-item">✅ 全年无限次 · 全11模块</div>
         <div class="af-item">✅ 导出Word/Markdown/PDF</div>
-        <div class="af-item">✅ 历史方案管理与对比</div>
+        <div class="af-item">✅ 历史管理与方案对比</div>
       </div>
     </div>
     <div class="modal-actions" style="justify-content:center;margin-top:24px">
@@ -608,11 +609,27 @@ let state = {
   compareMode: false,
   compareSelections: [],
   // Activation & usage tracking
-  activated: localStorage.getItem('mg_activated') === 'true',
+  activated: false,
   usageCount: parseInt(localStorage.getItem('mg_usage') || '0'),
   freeLimit: 3,
-  activationCode: localStorage.getItem('mg_code') || ''
+  activationCode: localStorage.getItem('mg_code') || '',
+  activationDate: localStorage.getItem('mg_activation_date') || ''
 };
+// Check if annual subscription is still valid (365 days from activation)
+(function checkActivation(){
+  const dateStr = localStorage.getItem('mg_activation_date');
+  if(dateStr && localStorage.getItem('mg_activated') === 'true'){
+    const activatedAt = new Date(dateStr);
+    const expiresAt = new Date(activatedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+    if(new Date() < expiresAt){
+      state.activated = true;
+    } else {
+      // Expired
+      state.activated = false;
+      localStorage.setItem('mg_activated', 'false');
+    }
+  }
+})();
 
 // ===== Initialization =====
 function init(){
@@ -818,8 +835,27 @@ function updateUsageBadge(){
   const badge = document.getElementById('usage-badge');
   if(!badge) return;
   if(state.activated){
-    badge.className = 'usage-badge activated';
-    badge.innerHTML = '✅ 已激活 · 无限使用';
+    const dateStr = localStorage.getItem('mg_activation_date');
+    if(dateStr){
+      const activatedAt = new Date(dateStr);
+      const expiresAt = new Date(activatedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      const daysLeft = Math.max(0, Math.ceil((expiresAt - now) / (24 * 60 * 60 * 1000)));
+      badge.className = 'usage-badge activated';
+      if(daysLeft > 30){
+        badge.innerHTML = `✅ 个人版 · 剩余 ${daysLeft} 天`;
+      } else if(daysLeft > 0){
+        badge.className = 'usage-badge free';
+        badge.innerHTML = `⏰ 即将到期 · 剩余 ${daysLeft} 天`;
+      } else {
+        badge.className = 'usage-badge free';
+        badge.innerHTML = '🔒 年度订阅已到期';
+        state.activated = false;
+      }
+    } else {
+      badge.className = 'usage-badge activated';
+      badge.innerHTML = '✅ 个人版 · 已激活';
+    }
   } else {
     const remaining = state.freeLimit - state.usageCount;
     if(remaining > 0){
@@ -869,14 +905,18 @@ function activateProduct(){
   const expected = Math.abs(hash).toString(36).toUpperCase().padStart(4,'0').slice(0,4);
 
   if(checksum === expected){
-    // Valid code - activate
+    // Valid code - activate with annual subscription
+    const now = new Date();
     state.activated = true;
     state.activationCode = code;
+    state.activationDate = now.toISOString();
     localStorage.setItem('mg_activated', 'true');
     localStorage.setItem('mg_code', code);
+    localStorage.setItem('mg_activation_date', now.toISOString());
     closeActivation();
     updateUsageBadge();
-    toast('🎉 激活成功！已解锁无限使用','success');
+    const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+    toast(`🎉 激活成功！有效期至 ${expiresAt.toLocaleDateString('zh-CN')}`, 'success');
   } else {
     toast('激活码无效，请检查后重试','error');
   }
