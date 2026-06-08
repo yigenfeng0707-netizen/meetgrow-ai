@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MeetGrow AI - 会展招商增长智能体</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+<!-- 百度统计 - 替换为您的站点ID -->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?YOUR_BAIDU_SITE_ID";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!-- Google Analytics - 替换为您的GA4 ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
 <style>
 :root{
   --primary:#0ea5e9;--primary-dark:#0284c7;--primary-light:#e0f2fe;
@@ -147,11 +165,21 @@ input,textarea,select{font-family:inherit;outline:none}
 .tab-panel .module-content em{color:var(--primary-dark);font-style:normal;font-weight:500}
 .tab-panel .module-content code{background:var(--primary-light);padding:2px 6px;border-radius:4px;font-size:13px;color:var(--primary-dark)}
 .tab-panel .module-content blockquote{border-left:3px solid var(--primary);padding:8px 16px;margin:12px 0;background:var(--primary-light);border-radius:0 var(--radius-xs) var(--radius-xs) 0}
+.tab-panel .module-content table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.tab-panel .module-content th{background:var(--primary-light);color:var(--primary-dark);font-weight:600;padding:8px 12px;border:1px solid var(--border);text-align:left}
+.tab-panel .module-content td{padding:8px 12px;border:1px solid var(--border)}
+.tab-panel .module-content tr:nth-child(even) td{background:var(--surface-alt)}
 .tab-panel .copy-btn{position:absolute;top:12px;right:12px;padding:6px 12px;border-radius:var(--radius-xs);background:var(--surface-alt);border:1px solid var(--border);font-size:12px;color:var(--text-secondary);transition:var(--transition)}
 .tab-panel .copy-btn:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
 .tab-panel{position:relative}
 .tab-progress{display:flex;align-items:center;gap:8px;padding:16px 0;color:var(--text-muted);font-size:14px}
 .tab-progress .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
+.gen-progress{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--surface-alt);border-bottom:1px solid var(--border)}
+.gen-progress-bar{flex:1;height:4px;background:var(--border-light);border-radius:2px;overflow:hidden}
+.gen-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:2px;transition:width .4s ease;width:0%}
+.gen-progress-text{font-size:12px;color:var(--text-secondary);white-space:nowrap;min-width:120px;text-align:right}
+.tab-btn.generating{animation:tabPulse 1.5s ease-in-out infinite}
+@keyframes tabPulse{0%,100%{opacity:.6}50%{opacity:1}}
 
 /* ===== History View ===== */
 .history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -203,17 +231,23 @@ input,textarea,select{font-family:inherit;outline:none}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* ===== Responsive ===== */
+.mobile-menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:200;width:40px;height:40px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border);font-size:20px;cursor:pointer;box-shadow:var(--shadow);align-items:center;justify-content:center}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+.sidebar-overlay.show{display:block}
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
+  .sidebar{transform:translateX(-100%);z-index:100}
   .sidebar.open{transform:translateX(0)}
   .main{margin-left:0}
-  .main-content{padding:20px 16px}
+  .main-content{padding:20px 16px;padding-top:60px}
   .form-grid{grid-template-columns:1fr}
   .module-grid{grid-template-columns:1fr 1fr}
   .output-header{flex-direction:column;gap:16px}
   .compare-grid{grid-template-columns:1fr}
   .tabs-nav{padding:0}
   .tab-btn{padding:10px 12px;font-size:12px}
+  .mobile-menu-btn{display:flex}
+  .modal{width:calc(100vw - 32px)!important;max-width:460px}
+  .main-header{padding:12px 16px 12px 56px}
 }
 
 /* ===== Print ===== */
@@ -268,6 +302,9 @@ input,textarea,select{font-family:inherit;outline:none}
       <a href="MeetGrow_AI_User_Manual.docx" download class="sidebar-item" style="text-decoration:none;margin-top:8px;background:rgba(34,197,94,.08);border-left-color:#22c55e;color:#86efac">
         <span class="icon">📖</span>下载产品使用手册
       </a>
+      <a href="https://wj.qq.com/s2/18866032/5cec/" target="_blank" class="sidebar-item" style="text-decoration:none;margin-top:4px;background:rgba(14,165,233,.06);border-left-color:var(--primary);color:#7dd3fc">
+        <span class="icon">💬</span>意见反馈
+      </a>
       <div class="sidebar-section" style="margin-top:16px">历史记录</div>
     </nav>
     <div class="history-list" id="sidebar-history"></div>
@@ -276,10 +313,12 @@ input,textarea,select{font-family:inherit;outline:none}
       <button class="btn-new" onclick="switchView('input')">＋ 新建</button>
     </div>
   </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
   <!-- Main -->
   <div class="main">
     <header class="main-header">
+      <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()" style="display:none">☰</button>
       <h2 id="page-title">新建招商增长方案</h2>
       <div class="header-actions">
         <div class="api-status disconnected" id="api-status" onclick="openSettings()" title="点击配置API">
@@ -375,6 +414,10 @@ input,textarea,select{font-family:inherit;outline:none}
         </div>
         <div class="tabs-container">
           <div class="tabs-nav" id="tabs-nav"></div>
+          <div class="gen-progress" id="gen-progress" style="display:none">
+            <div class="gen-progress-bar"><div class="gen-progress-fill" id="gen-progress-fill"></div></div>
+            <span class="gen-progress-text" id="gen-progress-text">准备中...</span>
+          </div>
           <div id="tabs-content"></div>
         </div>
       </div>
@@ -470,6 +513,11 @@ input,textarea,select{font-family:inherit;outline:none}
       <input type="text" id="s-baseurl" value="https://dashscope.aliyuncs.com/compatible-mode/v1">
       <div class="help">选择服务商后自动填入，也可手动修改为其他兼容地址</div>
     </div>
+    <div style="text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,0,0,.06)">
+      <a href="agreement.html" target="_blank" style="font-size:12px;color:#64748b;text-decoration:underline;margin-right:16px">用户协议</a>
+      <a href="agreement.html#privacy" target="_blank" style="font-size:12px;color:#64748b;text-decoration:underline;margin-right:16px">隐私政策</a>
+      <span style="font-size:11px;color:#94a3b8">V1.0</span>
+    </div>
     <div class="modal-actions">
       <button class="btn-outline" onclick="closeSettings()">取消</button>
       <button class="btn-primary" onclick="saveSettings()" style="padding:10px 24px;border-radius:var(--radius-sm)">保存设置</button>
@@ -502,6 +550,7 @@ input,textarea,select{font-family:inherit;outline:none}
     <div class="activation-contact">
       购买激活码请联系：<strong id="contact-info">微信/电话：18969081266</strong>
     </div>
+    <p style="font-size:12px;color:#94a3b8;text-align:center;margin-top:12px">激活即表示您已阅读并同意 <a href="agreement.html" target="_blank" style="color:#22d3ee;text-decoration:underline">《用户服务协议与隐私政策》</a></p>
     <div class="modal-actions">
       <button class="btn-outline" onclick="closeActivation()">稍后再说</button>
       <button class="btn-primary" onclick="activateProduct()" style="padding:10px 24px;border-radius:var(--radius-sm)">激活</button>
@@ -533,6 +582,7 @@ input,textarea,select{font-family:inherit;outline:none}
     <div class="activation-contact" style="margin-top:16px">
       购买激活码请联系：<strong id="contact-info-pw">微信/电话：18969081266</strong>
     </div>
+    <p style="font-size:11px;color:#94a3b8;margin-top:8px;text-align:center">使用本产品即表示同意 <a href="agreement.html" target="_blank" style="color:#22d3ee;text-decoration:underline">《用户协议》</a></p>
   </div>
 </div>
 
@@ -665,6 +715,14 @@ function toggleModule(el, id){
   } else {
     state.selectedModules = state.selectedModules.filter(x=>x!==id);
   }
+}
+
+// ===== Mobile Sidebar Toggle =====
+function toggleSidebar(){
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  if(overlay) overlay.classList.toggle('show');
 }
 
 // ===== View Management =====
@@ -1020,6 +1078,16 @@ ${moduleNames}
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div><span>正在生成...</span>';
 
+  // Show progress bar
+  const progressEl = document.getElementById('gen-progress');
+  const progressFill = document.getElementById('gen-progress-fill');
+  const progressText = document.getElementById('gen-progress-text');
+  if(progressEl) progressEl.style.display = 'flex';
+  if(progressFill) progressFill.style.width = '0%';
+  if(progressText) progressText.textContent = `正在生成 0/${selectedMods.length} 个模块...`;
+  window._genTotalMods = selectedMods.length;
+  window._genDoneMods = 0;
+
   try {
     const response = await fetch(`${state.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -1089,7 +1157,14 @@ ${moduleNames}
     }
 
     // Mark all tabs as done
-    document.querySelectorAll('.tab-btn').forEach(t=>t.classList.add('done'));
+    document.querySelectorAll('.tab-btn').forEach(t=>{t.classList.add('done');t.classList.remove('generating')});
+    // Update progress to 100%
+    const pf = document.getElementById('gen-progress-fill');
+    const pt = document.getElementById('gen-progress-text');
+    if(pf) pf.style.width = '100%';
+    if(pt) pt.textContent = `全部 ${selectedMods.length} 个模块已完成`;
+    // Auto-hide progress after 3s
+    setTimeout(()=>{const pe=document.getElementById('gen-progress');if(pe)pe.style.display='none';}, 3000);
     // Save to history
     saveToHistory(state.currentPlan);
     // Increment usage counter
@@ -1257,7 +1332,18 @@ function parseAndRenderModules(text, isFinal=false){
           state.currentPlan.content[mod.id] = content;
         }
         const tabBtn = document.querySelector(`.tab-btn[data-tab="${mod.id}"]`);
-        if(tabBtn) tabBtn.classList.add('done');
+        if(tabBtn && !tabBtn.classList.contains('done')){
+          tabBtn.classList.add('done');
+          tabBtn.classList.remove('generating');
+          window._genDoneMods = (window._genDoneMods || 0) + 1;
+          const total = window._genTotalMods || 1;
+          const done = window._genDoneMods;
+          const pct = Math.round((done / total) * 100);
+          const pf = document.getElementById('gen-progress-fill');
+          const pt = document.getElementById('gen-progress-text');
+          if(pf) pf.style.width = pct + '%';
+          if(pt) pt.textContent = `已生成 ${done}/${total} 个模块`;
+        }
       }
     }
   }
@@ -1277,7 +1363,47 @@ function renderMarkdown(text){
     // Inline code
     .replace(/`(.+?)`/g, '<code>$1</code>')
     // Blockquote
-    .replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>');
+
+  // Table support: parse pipe-delimited rows
+  html = html.replace(/^(\|.+\|)\n\|[\s\-:|]+\|\n((?:\|.+\|\n?)*)/gm, function(match, headerLine, bodyLines) {
+    const headers = headerLine.split('|').filter(c => c.trim()).map(c => c.trim());
+    let table = '<table><thead><tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>';
+    const rows = bodyLines.trim().split('\n');
+    for(const row of rows) {
+      const cells = row.split('|').filter(c => c.trim()).map(c => c.trim());
+      table += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+    }
+    table += '</tbody></table>';
+    return table;
+  });
+  // Also handle tables without separator line (simple pipe tables)
+  html = html.replace(/((?:^\|.+\|$(?:\n|<br>)?)+)/gm, function(block) {
+    if(block.includes('<table')) return block; // already processed
+    const rows = block.trim().split(/\n|<br>/).filter(r => r.trim());
+    if(rows.length < 1) return block;
+    // Check if second row is separator
+    const hasSep = rows.length >= 2 && /^\|[\s\-:|]+\|$/.test(rows[1].trim());
+    let table = '<table>';
+    const startIdx = hasSep ? 0 : 0;
+    rows.forEach((row, idx) => {
+      if(hasSep && idx === 1) return; // skip separator
+      const cells = row.split('|').filter(c => c.trim()).map(c => c.trim());
+      if(cells.length === 0) return;
+      const tag = (hasSep && idx === 0) ? 'th' : 'td';
+      const rowTag = (hasSep && idx === 0) ? 'thead' : 'tbody';
+      if(hasSep && idx === 0) {
+        table += '<thead><tr>' + cells.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+      } else {
+        table += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+      }
+    });
+    if(hasSep) table += '</tbody>';
+    table += '</table>';
+    return table;
+  });
+
+  html = html
     // Unordered list
     .replace(/^[-*]\s*(.+)$/gm, '<li>$1</li>')
     // Ordered list
@@ -1353,7 +1479,7 @@ th{background:#f1f5f9;font-weight:bold}
   }
 
   html += '</body></html>';
-  downloadFile(html, `${plan.name}-增长方案.doc`, 'application/msword');
+  downloadFile(html, `${plan.name}-增长方案.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
   toast('Word文件已导出','success');
 }
 
